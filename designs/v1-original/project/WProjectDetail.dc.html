@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22">
+  <aside style="flex: 1 1 232px; background: #10302D; color: #FFFFFF; display: flex; flex-direction: column; gap: 20px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: #FFFFFF; color: #0B6B63; display: flex; align-items: center; justify-content: center; font-weight: 800">S</div>
+      <span style="font-size: 17px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WProjects.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; background: #1F4D48; color: #FFFFFF; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #F2B66D; color: #3A2205; padding: 2px 8px; border-radius: 999px">6</span></a>
+      <a href="WLeaveSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave types &amp; rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Users &amp; settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #24504B">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #F2B66D; color: #3A2205; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 700">Meena Krishnan</span><span style="font-size: 12px; color: #C5D8D5">HR Admin</span></div>
+    </div>
+  </aside>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; flex-direction: column; gap: 12px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+      <nav aria-label="Breadcrumb" style="font-size: 13px; color: #5B6472"><a href="WProjects.dc.html" style="text-decoration: none; font-weight: 600">Projects</a> / Atlas Mobile Revamp</nav>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800">Atlas Mobile Revamp</h1>
+            <span style="font-size: 12px; font-weight: 700; color: #146C43; background: #E4F3EA; padding: 4px 10px; border-radius: 999px">On track</span>
+          </div>
+          <span style="font-size: 14px; color: #5B6472">Brightline Logistics · ATL-26 · Billable</span>
+        </div>
+        <button type="button" style="height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Edit project</button>
+        <button type="button" onClick="{{toggleAdd}}" style="display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 10px; border: 0; background: #0B6B63; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Add member</button>
+      </div>
+    </header>
+
+    <main style="padding: 24px 32px 40px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <sc-if value="{{adding}}" hint-placeholder-val="{{ false }}">
+          <section style="background: #FFFFFF; border: 2px solid #0B6B63; border-radius: 14px; padding: 18px 20px; display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end">
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 2 1 200px"><label for="am" style="font-size: 12px; font-weight: 700; color: #3B4250">Employee</label><select id="am" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF"><option>Rahul Verma · 40% free</option><option>Ananya Das · 50% free</option></select></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px"><label for="ar" style="font-size: 12px; font-weight: 700; color: #3B4250">Role</label><input id="ar" value="Designer" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 100px"><label for="aa" style="font-size: 12px; font-weight: 700; color: #3B4250">Allocation %</label><input id="aa" value="40" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px"><label for="af" style="font-size: 12px; font-weight: 700; color: #3B4250">From</label><input id="af" value="12 Oct 2026" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <button type="button" onClick="{{toggleAdd}}" style="height: 40px; padding: 0 18px; border-radius: 8px; border: 0; background: #0B6B63; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Add</button>
+          </section>
+        </sc-if>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; overflow: hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 800">Team &amp; allocation</h2>
+            <span style="font-size: 13px; color: #5B6472">7 members · 4.6 FTE</span>
+          </div>
+          <div style="overflow-x: auto">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 680px">
+              <thead><tr style="text-align: left; color: #5B6472; font-size: 12px; background: #FAFBFC"><th style="padding: 10px 20px">Member</th><th style="padding: 10px 12px">Role</th><th style="padding: 10px 12px; width: 220px">On this project</th><th style="padding: 10px 12px">Total load</th><th style="padding: 10px 20px">Period</th></tr></thead>
+              <tbody>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Arjun Mehta</td><td style="padding: 12px">Project lead</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 50%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">50%</span></div></td><td style="padding: 12px">100%</td><td style="padding: 12px 20px; color: #3B4250">Jun – Mar</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Priya Raman</td><td style="padding: 12px">Developer</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 60%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">60%</span></div></td><td style="padding: 12px">100%</td><td style="padding: 12px 20px; color: #3B4250">Jun – Mar</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Karthik S</td><td style="padding: 12px">Tech lead</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 80%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">80%</span></div></td><td style="padding: 12px"><span style="font-weight: 700; color: #B42318">120%</span></td><td style="padding: 12px 20px; color: #3B4250">Jun – Mar</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Divya Nair</td><td style="padding: 12px">QA</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 100%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">100%</span></div></td><td style="padding: 12px">100%</td><td style="padding: 12px 20px; color: #3B4250">Jul – Mar</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Vikram Rao</td><td style="padding: 12px">Mobile dev</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 50%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">50%</span></div></td><td style="padding: 12px">100%</td><td style="padding: 12px 20px; color: #3B4250">Jun – Mar</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Sneha Iyer</td><td style="padding: 12px">Backend</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 50%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">50%</span></div></td><td style="padding: 12px">90%</td><td style="padding: 12px 20px; color: #3B4250">Aug – Jan</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 12px 20px; font-weight: 700">Ananya Das</td><td style="padding: 12px">Frontend</td><td style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #EEF0F3"><div style="width: 50%; height: 8px; border-radius: 4px; background: #0B6B63"></div></div><span style="font-weight: 700; width: 36px">50%</span></div></td><td style="padding: 12px">50%</td><td style="padding: 12px 20px; color: #3B4250">Oct – Mar</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; padding: 12px 20px; background: #FBE7E5; color: #8F1D14; font-size: 13px; font-weight: 600">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17v.5"></path></svg>
+            Karthik S is allocated 120% across projects. Reduce one allocation.
+          </div>
+        </section>
+      </div>
+
+      <aside style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 800">Details</h2>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Start</span><span style="font-weight: 600">1 Jun 2026</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">End</span><span style="font-weight: 600">31 Mar 2027</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Client contact</span><span style="font-weight: 600">S. Narayanan</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Type</span><span style="font-weight: 600">Fixed scope</span></div>
+          <p style="margin: 0; font-size: 14px; color: #3B4250; line-height: 1.5; border-top: 1px solid #EEF0F3; padding-top: 12px">Rebuild of the driver and dispatcher apps on React Native with offline delivery tracking.</p>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 800">Team leave in next 30 days</h2>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">Vikram Rao</span><span style="color: #5B6472">7 – 9 Oct</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">Priya Raman</span><span style="color: #9A4A06; font-weight: 600">26 – 28 Oct · pending</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">Divya Nair</span><span style="color: #9A4A06; font-weight: 600">2 – 6 Nov · pending</span></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { adding: false };
+  }
+  renderVals() {
+    return {
+      adding: this.state.adding,
+      toggleAdd: () => this.setState({ adding: !this.state.adding })
+    };
+  }
+}
+</script>
+</body>
+</html>

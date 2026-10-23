@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team calendar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 24px 12px 8px; flex-shrink: 0">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #161A22; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800; flex: 1">Team calendar</h1>
+    <label for="teamsel" style="position: absolute; left: -9999px">Team</label>
+    <select id="teamsel" style="height: 40px; border: 1px solid #C9CED6; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 13px; font-weight: 600; background: #FFFFFF; margin-right: 8px">
+      <option>My team</option>
+      <option>Engineering</option>
+      <option>Everyone</option>
+    </select>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 4px 20px 16px; overflow: hidden">
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <button type="button" aria-label="Previous month" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #161A22"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 800">October 2026</h2>
+        <button type="button" aria-label="Next month" style="width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #161A22"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; font-size: 11px; font-weight: 700; color: #5B6472; text-align: center">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="35">
+          <button type="button" onClick="{{d.pick}}" aria-label="{{d.aria}}" style="{{d.style}}">
+            <span>{{d.n}}</span>
+            <span style="{{d.dotStyle}}"></span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 14px; font-size: 11px; color: #3B4250; padding-top: 4px; flex-wrap: wrap">
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: #0B6B63"></span>Team leave</span>
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: #B42318"></span>Holiday</span>
+        <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; border: 2px solid #0B6B63; box-sizing: border-box"></span>Selected</span>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 700">{{selTitle}}</h2>
+      <sc-if value="{{hasHoliday}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 12px; background: #FBE7E5; border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 700; color: #8F1D14">{{holiday}} · Company holiday</div>
+      </sc-if>
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="2">
+        <div style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 10px 14px">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: #DCE3F0; color: #2B3445; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">{{p.initials}}</div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 14px; font-weight: 700">{{p.name}}</span>
+            <span style="font-size: 12px; color: #5B6472">{{p.detail}}</span>
+          </div>
+          <span style="{{p.chip}}">{{p.state}}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 16px; font-size: 14px; color: #5B6472; text-align: center">Everyone is in. Nobody is on leave this day.</div>
+      </sc-if>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 7 };
+  }
+  renderVals() {
+    const leaves = [
+      { initials: 'SI', name: 'Sneha Iyer', type: 'Sick leave', from: 7, to: 7, ok: true },
+      { initials: 'VR', name: 'Vikram Rao', type: 'Earned leave', from: 7, to: 9, ok: true },
+      { initials: 'KS', name: 'Karthik S', type: 'Casual leave', from: 9, to: 9, ok: false },
+      { initials: 'AD', name: 'Ananya Das', type: 'Earned leave', from: 15, to: 16, ok: true },
+      { initials: 'PR', name: 'Priya Raman (you)', type: 'Earned leave', from: 26, to: 28, ok: false }
+    ];
+    const holidays = { 2: 'Gandhi Jayanti', 20: 'Dussehra' };
+    const cells = [];
+    [28, 29, 30].forEach((n) => cells.push({ n, out: true }));
+    for (let i = 1; i <= 31; i++) cells.push({ n: i, out: false });
+    cells.push({ n: 1, out: true });
+    const sel = this.state.sel;
+    const days = cells.map((c, idx) => {
+      const weekend = idx % 7 >= 5;
+      const isSel = !c.out && c.n === sel;
+      const isToday = !c.out && c.n === 7;
+      const hasLeave = !c.out && leaves.some((l) => c.n >= l.from && c.n <= l.to);
+      const hol = !c.out && holidays[c.n];
+      let style = 'height: 46px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 10px; font: inherit; font-size: 14px; padding: 0; ';
+      style += isSel ? 'border: 2px solid #0B6B63; background: #E3F1EF; font-weight: 800; color: #0B6B63;' : 'border: 2px solid transparent; background: transparent; ';
+      if (!isSel) style += c.out ? 'color: #A3AAB6; font-weight: 500;' : weekend ? 'color: #5B6472; font-weight: 500;' : 'color: #161A22; font-weight: 600;';
+      if (isToday && !isSel) style += ' text-decoration: underline; text-underline-offset: 3px;';
+      const dotColor = hol ? '#B42318' : hasLeave ? '#0B6B63' : 'transparent';
+      return {
+        n: c.n,
+        aria: (c.out ? 'Outside month ' : 'October ') + c.n + (hol ? ', ' + hol : '') + (hasLeave ? ', team leave' : ''),
+        style,
+        dotStyle: 'width: 6px; height: 6px; border-radius: 50%; background: ' + dotColor + ';',
+        pick: () => { if (!c.out) this.setState({ sel: c.n }); }
+      };
+    });
+    const chipBase = 'font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; ';
+    const people = leaves.filter((l) => sel >= l.from && sel <= l.to).map((l) => ({
+      ...l,
+      detail: l.type + (l.from === l.to ? ' · 1 day' : ' · ' + l.from + '–' + l.to + ' Oct'),
+      state: l.ok ? 'Approved' : 'Pending',
+      chip: chipBase + (l.ok ? 'color: #146C43; background: #E4F3EA;' : 'color: #9A4A06; background: #FDF0E1;')
+    }));
+    const dows = ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed'];
+    return {
+      days,
+      people,
+      empty: people.length === 0 && !holidays[sel],
+      hasHoliday: !!holidays[sel],
+      holiday: holidays[sel] || '',
+      selTitle: (sel === 7 ? 'Today · ' : '') + dows[(sel - 1) % 7] + ', ' + sel + ' October'
+    };
+  }
+}
+</script>
+</body>
+</html>

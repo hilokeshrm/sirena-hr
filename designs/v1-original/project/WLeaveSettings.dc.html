@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Leave types and rules</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22">
+  <aside style="flex: 1 1 232px; background: #10302D; color: #FFFFFF; display: flex; flex-direction: column; gap: 20px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: #FFFFFF; color: #0B6B63; display: flex; align-items: center; justify-content: center; font-weight: 800">S</div>
+      <span style="font-size: 17px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WProjects.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #F2B66D; color: #3A2205; padding: 2px 8px; border-radius: 999px">6</span></a>
+      <a href="WLeaveSettings.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; background: #1F4D48; color: #FFFFFF; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave types &amp; rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Users &amp; settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #24504B">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #F2B66D; color: #3A2205; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 700">Meena Krishnan</span><span style="font-size: 12px; color: #C5D8D5">HR Admin</span></div>
+    </div>
+  </aside>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+      <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px">
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800">Leave types &amp; rules</h1>
+        <span style="font-size: 13px; color: #5B6472">Leave year: Jan – Dec · Accrual runs on the 1st of each month</span>
+      </div>
+      <button type="button" style="display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New leave type</button>
+    </header>
+
+    <main style="padding: 24px 32px 40px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <nav aria-label="Leave types" style="flex: 1 1 240px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 8px; display: flex; flex-direction: column; gap: 2px">
+        <sc-for list="{{types}}" as="t" hint-placeholder-count="7">
+          <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.sel}}" style="{{t.style}}">
+            <span style="{{t.swatch}}"></span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 1px; text-align: left"><span style="font-size: 14px; font-weight: 700">{{t.name}}</span><span style="font-size: 12px; color: #5B6472">{{t.sub}}</span></span>
+          </button>
+        </sc-for>
+      </nav>
+
+      <section style="flex: 3 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800">{{cur.name}} ({{cur.code}})</h2>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; min-height: 44px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Active</label>
+        </div>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px">
+          <legend style="font-size: 13px; font-weight: 800; color: #0B6B63; letter-spacing: 0.4px; padding: 0; margin-bottom: 12px">ENTITLEMENT</legend>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q1" style="font-size: 12px; font-weight: 700; color: #3B4250">Days per year</label><input id="q1" value="{{cur.quota}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q2" style="font-size: 12px; font-weight: 700; color: #3B4250">Accrual</label><select id="q2" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF; min-width: 0"><option>{{cur.accrual}}</option><option>Monthly</option><option>Quarterly</option><option>Up front (1 Jan)</option><option>On approval (comp-off)</option></select></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q3" style="font-size: 12px; font-weight: 700; color: #3B4250">Prorate for new joiners</label><select id="q3" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF; min-width: 0"><option>Yes, by joining month</option><option>No</option></select></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q4" style="font-size: 12px; font-weight: 700; color: #3B4250">Carry forward (max days)</label><input id="q4" value="{{cur.carry}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q5" style="font-size: 12px; font-weight: 700; color: #3B4250">Encashable (max days)</label><input id="q5" value="{{cur.encash}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="q6" style="font-size: 12px; font-weight: 700; color: #3B4250">Applies to</label><select id="q6" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF; min-width: 0"><option>{{cur.applies}}</option><option>All employees</option><option>Confirmed only</option></select></div>
+          </div>
+        </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px">
+          <legend style="font-size: 13px; font-weight: 800; color: #0B6B63; letter-spacing: 0.4px; padding: 0; margin-bottom: 12px">APPLYING</legend>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="r1" style="font-size: 12px; font-weight: 700; color: #3B4250">Minimum notice (days)</label><input id="r1" value="{{cur.notice}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="r2" style="font-size: 12px; font-weight: 700; color: #3B4250">Max consecutive days</label><input id="r2" value="{{cur.maxRun}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="r3" style="font-size: 12px; font-weight: 700; color: #3B4250">Document needed after</label><input id="r3" value="{{cur.doc}}" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 28px">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Allow half days</label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 40px"><input type="checkbox" checked="{{cur.backdate}}" style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Allow back-dated requests</label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 40px"><input type="checkbox" checked="{{cur.sandwich}}" style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Sandwich rule: count weekends &amp; holidays in between</label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 40px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Allow negative balance</label>
+          </div>
+        </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+          <legend style="font-size: 13px; font-weight: 800; color: #0B6B63; letter-spacing: 0.4px; padding: 0; margin-bottom: 12px">APPROVAL FLOW</legend>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+            <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; background: #F4F5F7; border: 1px solid #E3E6EB; font-size: 14px; font-weight: 700">1 · Reporting manager</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6472" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; background: #F4F5F7; border: 1px solid #E3E6EB; font-size: 14px; font-weight: 700">2 · HR · {{cur.hrStep}}</span>
+            <button type="button" style="height: 40px; padding: 0 14px; border-radius: 10px; border: 1px dashed #A3AAB6; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #3B4250">+ Add step</button>
+          </div>
+          <span style="font-size: 13px; color: #5B6472">Auto-escalate to HR if the manager hasn't acted in 48 hours.</span>
+        </fieldset>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #E3E6EB; padding-top: 18px">
+          <button type="button" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Discard</button>
+          <button type="button" style="height: 44px; padding: 0 20px; border-radius: 10px; border: 0; background: #0B6B63; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Save rules</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 'EL' };
+  }
+  renderVals() {
+    const types = [
+      { code: 'CL', name: 'Casual leave', color: '#0B6B63', quota: '12', accrual: 'Monthly', carry: '0', encash: '0', applies: 'All employees', notice: '1', maxRun: '3', doc: 'Never', backdate: false, sandwich: false, hrStep: 'only if > 3 days' },
+      { code: 'SL', name: 'Sick leave', color: '#C2570C', quota: '12', accrual: 'Up front (1 Jan)', carry: '0', encash: '0', applies: 'All employees', notice: '0', maxRun: '10', doc: '2 days', backdate: true, sandwich: false, hrStep: 'only if > 2 days' },
+      { code: 'EL', name: 'Earned leave', color: '#2649B5', quota: '18', accrual: 'Monthly', carry: '30', encash: '15', applies: 'Confirmed only', notice: '7', maxRun: '15', doc: 'Never', backdate: false, sandwich: true, hrStep: 'always' },
+      { code: 'CO', name: 'Comp-off', color: '#6B3FA0', quota: 'Earned', accrual: 'On approval (comp-off)', carry: 'Expires in 60 days', encash: '0', applies: 'All employees', notice: '1', maxRun: '2', doc: 'Never', backdate: false, sandwich: false, hrStep: 'never' },
+      { code: 'ML', name: 'Maternity leave', color: '#A3366B', quota: '182', accrual: 'Up front (1 Jan)', carry: '0', encash: '0', applies: 'Eligible employees', notice: '30', maxRun: '182', doc: 'Always', backdate: false, sandwich: true, hrStep: 'always' },
+      { code: 'PL', name: 'Paternity leave', color: '#1C7C8C', quota: '5', accrual: 'Up front (1 Jan)', carry: '0', encash: '0', applies: 'Eligible employees', notice: '7', maxRun: '5', doc: 'Always', backdate: false, sandwich: false, hrStep: 'always' },
+      { code: 'LOP', name: 'Loss of pay', color: '#5B6472', quota: 'Unlimited', accrual: 'Up front (1 Jan)', carry: '0', encash: '0', applies: 'All employees', notice: '1', maxRun: '30', doc: 'Never', backdate: true, sandwich: true, hrStep: 'always' }
+    ];
+    const s = this.state.sel;
+    return {
+      types: types.map((t) => ({
+        ...t,
+        sub: t.code + ' · ' + t.quota + (isNaN(+t.quota) ? '' : ' days/yr'),
+        sel: t.code === s ? 'true' : 'false',
+        pick: () => this.setState({ sel: t.code }),
+        swatch: 'width: 10px; height: 34px; border-radius: 4px; flex-shrink: 0; background: ' + t.color + ';',
+        style: 'display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 10px; font: inherit; color: #161A22; cursor: pointer; ' + (t.code === s ? 'background: #E3F1EF; border: 1px solid #9CCBC5;' : 'background: transparent; border: 1px solid transparent;')
+      })),
+      cur: types.find((t) => t.code === s)
+    };
+  }
+}
+</script>
+</body>
+</html>

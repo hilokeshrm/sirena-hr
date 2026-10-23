@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Policy detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#CC4C5C}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A; overflow: hidden">
+  <header style="position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 12px; padding: 22px 20px 22px; background: #BBBDBF; flex-shrink: 0">
+    <div style="position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.3)"></div>
+    <div style="position: absolute; right: 70px; bottom: -20px; width: 50px; height: 50px; border-radius: 14px; background: #BBBDBF; transform: rotate(18deg)"></div>
+    <div style="position: relative; display: flex; justify-content: space-between">
+      <a href="Policies.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #2A2A2A">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+      <button type="button" aria-label="Download PDF" style="width: 44px; height: 44px; border-radius: 14px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #2A2A2A">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg></button>
+    </div>
+    <span style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #2A2A2A">WORK · VERSION 3 · 4 MIN READ</span>
+    <h1 style="position: relative; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; line-height: 1.05; letter-spacing: -0.5px">Work From Home Policy</h1>
+  </header>
+
+  <article style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; overflow: hidden">
+    <div style="display: flex; gap: 12px; align-items: flex-start; background: #F3879C; border-radius: 20px; padding: 12px 14px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2A2A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"></path></svg>
+      <span style="font-size: 13px; line-height: 1.5"><strong>New in v3:</strong> 3 WFH days a week (up from 2). Core hours are now 11:00–16:00 IST.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.6; color: #2A2A2A">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; color: #2A2A2A">1. Who can WFH</h2>
+      <p style="margin: 0">Confirmed employees, up to three days a week, with their manager's agreement. People on probation need HR's OK.</p>
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; color: #2A2A2A">2. Be reachable</h2>
+      <p style="margin: 0">Stay on chat and calls during core hours and keep your calendar current.</p>
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; color: #2A2A2A">3. Stay secure</h2>
+      <p style="margin: 0">Company laptop only, always on VPN.</p>
+    </div>
+  </article>
+
+  <footer style="flex-shrink: 0; padding: 14px 20px 24px; display: flex; flex-direction: column; gap: 12px; background: #F5F5F5; border-radius: 28px 28px 0 0">
+    <sc-if value="{{notAcked}}" hint-placeholder-val="{{ true }}">
+      <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #2A2A2A; line-height: 1.45; min-height: 44px">
+        <input type="checkbox" checked="{{agree}}" onChange="{{toggle}}" style="width: 22px; height: 22px; accent-color: #A32330; margin: 0; flex-shrink: 0">
+        I’ve read and understood the Work From Home Policy, v3.
+      </label>
+      <button type="button" onClick="{{ack}}" disabled="{{disabled}}" style="{{btnStyle}}">Got it, I agree</button>
+    </sc-if>
+    <sc-if value="{{acked}}" hint-placeholder-val="{{ false }}">
+      <div style="position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; background: #2A2A2A; color: #FFFFFF; border-radius: 22px; padding: 16px">
+        <div style="position: absolute; right: 20px; top: -8px; width: 14px; height: 14px; border-radius: 50%; background: #F3879C"></div>
+        <div style="position: absolute; right: 60px; bottom: 6px; width: 10px; height: 10px; border-radius: 3px; background: #BBBDBF; transform: rotate(30deg)"></div>
+        <div style="position: absolute; right: 10px; bottom: 14px; width: 8px; height: 8px; border-radius: 50%; background: #E75562"></div>
+        <span style="width: 44px; height: 44px; border-radius: 50%; background: #F3879C; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2A2A2A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 800">All set!</span><span style="font-size: 12px; color: #BBBDBF">Acknowledged 7 Oct, 10:14 · HR has been notified</span></span>
+      </div>
+    </sc-if>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { agree: false, acked: false };
+  }
+  renderVals() {
+    const can = this.state.agree;
+    return {
+      agree: this.state.agree,
+      acked: this.state.acked,
+      notAcked: !this.state.acked,
+      disabled: !can,
+      toggle: () => this.setState({ agree: !this.state.agree }),
+      ack: () => { if (can) this.setState({ acked: true }); },
+      btnStyle: 'height: 56px; border-radius: 18px; border: 0; font: inherit; font-size: 16px; font-weight: 800; ' + (can ? 'background: #A32330; color: #FFFFFF;' : 'background: #E7E8E9; color: #717373;')
+    };
+  }
+}
+</script>
+</body>
+</html>

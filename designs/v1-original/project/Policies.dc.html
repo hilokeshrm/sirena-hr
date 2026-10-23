@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Policies</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; flex-direction: column; gap: 12px; padding: 28px 20px 8px; flex-shrink: 0">
+    <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.3px">HR policies</h1>
+    <div style="display: flex; align-items: center; gap: 10px; height: 48px; background: #FFFFFF; border: 1px solid #C9CED6; border-radius: 12px; padding: 0 14px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6472" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <label for="q" style="position: absolute; left: -9999px">Search policies</label>
+      <input id="q" type="search" placeholder="Search policies" style="flex: 1; border: 0; outline: none; font: inherit; font-size: 14px; background: transparent">
+    </div>
+    <div style="display: flex; gap: 8px; overflow: hidden">
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="4">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 8px 20px 16px; overflow: hidden">
+    <sc-for list="{{items}}" as="p" hint-placeholder-count="6">
+      <a href="PolicyDetail.dc.html" style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 12px 14px; text-decoration: none; color: #161A22">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #EEF0F3; color: #3B4250; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+          <span style="font-size: 14px; font-weight: 700">{{p.title}}</span>
+          <span style="font-size: 12px; color: #5B6472">{{p.meta}}</span>
+        </div>
+        <span style="{{p.chip}}">{{p.status}}</span>
+      </a>
+    </sc-for>
+  </main>
+
+  <nav aria-label="Main" style="display: flex; justify-content: space-around; align-items: center; height: 76px; background: #FFFFFF; border-top: 1px solid #E3E6EB; padding: 0 8px 12px; box-sizing: border-box; flex-shrink: 0">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>Home</a>
+    <a href="Leave.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave</a>
+    <a href="Policies.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #0B6B63; font-size: 11px; font-weight: 700">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+    <a href="Directory.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Team</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>Me</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'All' };
+  }
+  renderVals() {
+    const all = [
+      { title: 'Work From Home Policy', cat: 'Work', meta: 'Work · v3 · updated 30 Sep', todo: true },
+      { title: 'Leave Policy 2026', cat: 'Leave', meta: 'Leave · v2 · updated 2 Jan', todo: false },
+      { title: 'Code of Conduct', cat: 'Conduct', meta: 'Conduct · v4 · updated 15 Mar', todo: false },
+      { title: 'POSH: Prevention of Sexual Harassment', cat: 'Conduct', meta: 'Conduct · v2 · updated 10 Feb', todo: false },
+      { title: 'Travel & Expense Reimbursement', cat: 'Finance', meta: 'Finance · v1 · updated 22 Jul', todo: false },
+      { title: 'IT & Acceptable Use', cat: 'Work', meta: 'Work · v2 · updated 5 May', todo: false },
+      { title: 'Holiday List 2026', cat: 'Leave', meta: 'Leave · v1 · updated 20 Dec 2025', todo: false }
+    ];
+    const cats = ['All', 'Leave', 'Work', 'Conduct', 'Finance'];
+    const chip = 'font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 999px; white-space: nowrap; ';
+    return {
+      cats: cats.map((c) => {
+        const on = c === this.state.cat;
+        return {
+          label: c,
+          pressed: on ? 'true' : 'false',
+          style: 'height: 36px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 13px; white-space: nowrap; ' + (on ? 'background: #161A22; color: #FFFFFF; border: 1px solid #161A22; font-weight: 700;' : 'background: #FFFFFF; color: #3B4250; border: 1px solid #C9CED6; font-weight: 600;'),
+          pick: () => this.setState({ cat: c })
+        };
+      }),
+      items: all.filter((p) => this.state.cat === 'All' || p.cat === this.state.cat).map((p) => ({
+        ...p,
+        status: p.todo ? 'Action needed' : 'Read',
+        chip: chip + (p.todo ? 'color: #9A4A06; background: #FDF0E1;' : 'color: #146C43; background: #E4F3EA;')
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

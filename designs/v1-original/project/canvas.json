@@ -1,0 +1,310 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "ApplyLeave.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "04 · Apply leave",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "Approvals.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "06 · Approvals (manager)",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "Directory.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "10 · Team directory",
+      "w": 390,
+      "x": 940,
+      "y": 964
+    },
+    "Leave.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "03 · My leave",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "LeaveDetail.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "05 · Leave request detail",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "Login.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "01 · Login",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "02 · Home",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Notifications.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "13 · Notifications",
+      "w": 390,
+      "x": 2350,
+      "y": 964
+    },
+    "Policies.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "08 · Policies",
+      "w": 390,
+      "x": 0,
+      "y": 964
+    },
+    "PolicyDetail.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "09 · Policy + acknowledge",
+      "w": 390,
+      "x": 470,
+      "y": 964
+    },
+    "Profile.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "11 · Me / profile",
+      "w": 390,
+      "x": 1410,
+      "y": 964
+    },
+    "Projects.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "12 · My projects",
+      "w": 390,
+      "x": 1880,
+      "y": 964
+    },
+    "TeamCalendar.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "mobile",
+      "title": "07 · Team calendar",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "WDashboard.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W1 · HR dashboard",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "WEmployeeDetail.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W3 · Employee detail",
+      "w": 1440,
+      "x": 0,
+      "y": 1240
+    },
+    "WEmployees.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W2 · Employees",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "WHolidays.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W8 · Holiday calendar",
+      "w": 1440,
+      "x": 1520,
+      "y": 3720
+    },
+    "WLeaveApprovals.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W6 · Leave approvals",
+      "w": 1440,
+      "x": 1520,
+      "y": 2480
+    },
+    "WLeaveSettings.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W7 · Leave types & rules",
+      "w": 1440,
+      "x": 0,
+      "y": 3720
+    },
+    "WPolicies.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W9 · Policies",
+      "w": 1440,
+      "x": 0,
+      "y": 4960
+    },
+    "WPolicyEditor.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W10 · Policy editor",
+      "w": 1440,
+      "x": 1520,
+      "y": 4960
+    },
+    "WProjectDetail.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W5 · Project detail",
+      "w": 1440,
+      "x": 0,
+      "y": 2480
+    },
+    "WProjects.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W4 · Projects",
+      "w": 1440,
+      "x": 1520,
+      "y": 1240
+    },
+    "WReports.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W11 · Reports",
+      "w": 1440,
+      "x": 0,
+      "y": 6200
+    },
+    "WSettings.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "web",
+      "title": "W12 · Users, roles & settings",
+      "w": 1440,
+      "x": 1520,
+      "y": 6200
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-07T09:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "page": "mobile",
+    "view": "canvas"
+  },
+  "notes": {
+    "mobileTitle": {
+      "kind": "title1",
+      "maxW": 3210,
+      "page": "mobile",
+      "text": "Mobile app · Employee & Manager (Android / iOS)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "webTitle": {
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "web",
+      "text": "Web admin console · HR & Admin",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Login.dc.html",
+    "Leave.dc.html",
+    "ApplyLeave.dc.html",
+    "LeaveDetail.dc.html",
+    "Approvals.dc.html",
+    "TeamCalendar.dc.html",
+    "Policies.dc.html",
+    "PolicyDetail.dc.html",
+    "Directory.dc.html",
+    "Profile.dc.html",
+    "Projects.dc.html",
+    "Notifications.dc.html",
+    "WDashboard.dc.html",
+    "WEmployees.dc.html",
+    "WEmployeeDetail.dc.html",
+    "WProjects.dc.html",
+    "WProjectDetail.dc.html",
+    "WLeaveApprovals.dc.html",
+    "WLeaveSettings.dc.html",
+    "WHolidays.dc.html",
+    "WPolicies.dc.html",
+    "WPolicyEditor.dc.html",
+    "WReports.dc.html",
+    "WSettings.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "mobile",
+      "name": "Mobile app"
+    },
+    {
+      "id": "web",
+      "name": "Web admin"
+    }
+  ],
+  "title": "HR Suite UI Mockups"
+}

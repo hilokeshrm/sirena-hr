@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Set up your account</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#2A2A2A}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A">
+  <section aria-label="Your invite" style="flex: 1 1 420px; background: #2A2A2A; color: #FFFFFF; padding: 56px 56px 48px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 48px">
+    <img src="/_blob/a682b71f41d42919c9a22b8b695a142c" alt="Sirena" style="width: 170px; height: auto; display: block">
+    <div style="display: flex; flex-direction: column; gap: 18px; max-width: 460px">
+      <span style="font-size: 13px; font-weight: 800; letter-spacing: 1.5px; color: #EDEDED">YOU’RE INVITED</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; font-weight: 800; line-height: 1.05; letter-spacing: -1px">Welcome to Sirena, Nikhil.</h1>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 18px; background: rgba(255,255,255,0.08); font-size: 14px">
+        <span style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #EDEDED">Invited by</span><strong>Meena Krishnan, HR</strong></span>
+        <span style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #EDEDED">Role</span><strong>Account Executive · Sales</strong></span>
+        <span style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #EDEDED">Location</span><strong>Bengaluru</strong></span>
+        <span style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #EDEDED">Starts</span><strong>Mon, 5 Oct 2026</strong></span>
+      </div>
+      <span style="font-size: 13px; color: #EDEDED; line-height: 1.5">Accounts are by invite only and need an @sirena.in email. HR sets your role and access.</span>
+    </div>
+    <span style="font-size: 12px; color: #EDEDED">Invite link expires in 6 days</span>
+  </section>
+
+  <main style="flex: 1 1 480px; display: flex; align-items: center; justify-content: center; padding: 48px 24px; box-sizing: border-box">
+    <div style="width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 22px">
+      <ol aria-label="Steps" style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+          <li style="display: flex; flex-direction: column; gap: 6px"><span style="{{s.bar}}"></span><span style="{{s.labelStyle}}">{{s.label}}</span></li>
+        </sc-for>
+      </ol>
+
+      <sc-if value="{{is1}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.6px">Create your account</h2>
+          <span style="font-size: 15px">This is what you’ll use on the web and the app.</span>
+        </div>
+        <form style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="fn" style="font-size: 13px; font-weight: 800">Full name</label><input id="fn" value="Nikhil Joshi" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="we" style="font-size: 13px; font-weight: 800">Work email</label><input id="we" value="nikhil.joshi@sirena.in" readonly style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #FFFFFF; box-sizing: border-box"><span style="font-size: 12px">Set by HR. Can’t be changed.</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="np" style="font-size: 13px; font-weight: 800">Password</label>
+            <input id="np" type="password" value="Sirena#2026" style="height: 50px; border: 2px solid #2A2A2A; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; box-sizing: border-box">
+            <span style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px"><span style="height: 5px; border-radius: 3px; background: #A32330"></span><span style="height: 5px; border-radius: 3px; background: #A32330"></span><span style="height: 5px; border-radius: 3px; background: #A32330"></span><span style="height: 5px; border-radius: 3px; background: #EDEDED"></span></span>
+            <span style="font-size: 12px">Strong · 12+ characters with a number and a symbol</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="cp" style="font-size: 13px; font-weight: 800">Confirm password</label><input id="cp" type="password" value="Sirena#2026" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box"></div>
+          <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.45; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #A32330; margin: 2px 0 0; flex-shrink: 0">I agree to the <a href="#terms" style="font-weight: 800; text-decoration: none">acceptable use policy</a> and how Sirena handles my data.</label>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{is2}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.6px">A bit about you</h2>
+          <span style="font-size: 15px">Only HR and you can see these.</span>
+        </div>
+        <form style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="ph" style="font-size: 13px; font-weight: 800">Phone</label><input id="ph" value="+91 99000 11223" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box; min-width: 0"></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><label for="db" style="font-size: 13px; font-weight: 800">Birthday</label><input id="db" value="22 Jul 1998" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box; min-width: 0"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="ec" style="font-size: 13px; font-weight: 800">Emergency contact</label><input id="ec" value="Anil Joshi (father) · +91 98450 22334" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box"></div>
+          <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+            <legend style="font-size: 13px; font-weight: 800; padding: 0 0 8px">Lunch preference</legend>
+            <div style="display: flex; gap: 10px">
+              <sc-for list="{{foods}}" as="f" hint-placeholder-count="2">
+                <button type="button" onClick="{{f.pick}}" aria-pressed="{{f.sel}}" style="{{f.style}}">{{f.label}}</button>
+              </sc-for>
+            </div>
+          </fieldset>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{is3}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.6px">Keep it safe</h2>
+          <span style="font-size: 15px; line-height: 1.5">Add a second step at sign-in. It’s optional for you, required for HR and admins.</span>
+        </div>
+        <div style="display: flex; gap: 18px; align-items: center; padding: 18px; border: 1px solid #EDEDED; border-radius: 18px">
+          <div aria-label="QR code for authenticator app" style="display: grid; grid-template-columns: repeat(5, 14px); gap: 3px; padding: 10px; border-radius: 12px; background: #EDEDED; flex-shrink: 0">
+            <span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span>
+            <span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span>
+            <span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span>
+            <span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span>
+            <span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span><span style="width: 14px; height: 14px; background: #2A2A2A"></span>
+          </div>
+          <span style="font-size: 14px; line-height: 1.5">Scan with Google Authenticator or Microsoft Authenticator, then enter the code to confirm.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="code" style="font-size: 13px; font-weight: 800">6-digit code</label><input id="code" value="" placeholder="000 000" style="height: 50px; border: 2px solid #2A2A2A; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 18px; font-weight: 800; letter-spacing: 4px; box-sizing: border-box"></div>
+      </sc-if>
+
+      <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 24px; border: 2px solid #2A2A2A; border-radius: 20px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800">You’re in, Nikhil.</h2>
+          <span style="font-size: 15px; line-height: 1.5">Your account is ready. Get the Sirena HR app on your phone so check-in works on office Wi-Fi.</span>
+        </div>
+        <a href="WLogin.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 14px; background: #A32330; color: #FFFFFF; font-size: 16px; font-weight: 800; text-decoration: none">Go to sign in</a>
+      </sc-if>
+
+      <sc-if value="{{showNav}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: 10px">
+          <button type="button" onClick="{{back}}" disabled="{{noBack}}" style="{{backStyle}}">Back</button>
+          <button type="button" onClick="{{next}}" style="flex: 2; height: 54px; border-radius: 14px; border: 0; background: #A32330; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer">{{nextLabel}}</button>
+        </div>
+        <p style="margin: 0; font-size: 14px; text-align: center">Already set up? <a href="WLogin.dc.html" style="font-weight: 800; text-decoration: none">Sign in</a></p>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 1, food: 'veg' };
+  }
+  renderVals() {
+    const { step, food } = this.state;
+    const labels = ['Account', 'About you', 'Security'];
+    return {
+      steps: labels.map((label, i) => {
+        const n = i + 1;
+        const on = step >= n;
+        return {
+          label: n + '. ' + label,
+          bar: 'display: block; height: 5px; border-radius: 3px; background: ' + (on ? '#A32330' : '#EDEDED') + ';',
+          labelStyle: 'font-size: 12px; ' + (step === n ? 'font-weight: 800; color: #A32330;' : 'font-weight: 600;')
+        };
+      }),
+      is1: step === 1, is2: step === 2, is3: step === 3, isDone: step === 4,
+      showNav: step < 4,
+      noBack: step === 1,
+      backStyle: 'flex: 1; height: 54px; border-radius: 14px; border: 1px solid #EDEDED; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; color: #2A2A2A; ' + (step === 1 ? 'opacity: 0.5;' : 'cursor: pointer;'),
+      nextLabel: step === 1 ? 'Continue' : step === 2 ? 'Continue' : 'Finish setup',
+      next: () => this.setState({ step: Math.min(step + 1, 4) }),
+      back: () => this.setState({ step: Math.max(step - 1, 1) }),
+      foods: [['veg', 'Veg'], ['non', 'Non-veg']].map(([id, label]) => ({
+        label, sel: food === id ? 'true' : 'false', pick: () => this.setState({ food: id }),
+        style: 'flex: 1; height: 50px; border-radius: 14px; font: inherit; font-size: 15px; cursor: pointer; ' + (food === id ? 'background: #2A2A2A; color: #FFFFFF; border: 1px solid #2A2A2A; font-weight: 800;' : 'background: #FFFFFF; color: #2A2A2A; border: 1px solid #EDEDED; font-weight: 700;')
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

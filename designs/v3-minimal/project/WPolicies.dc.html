@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Policies admin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#A32330}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A">
+  <aside style="flex: 1 1 236px; background: #2A2A2A; color: #FFFFFF; display: flex; flex-direction: column; gap: 18px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #A32330; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px">S</div>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WAttendance.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Attendance</a>
+      <a href="WCafeteria.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 1-3 3.5-3 7h3v11"></path></svg>Cafeteria</a>
+      <a href="WProjects.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #A32330; color: #FFFFFF; padding: 2px 8px; border-radius: 999px">6</span></a>
+      <a href="WLeaveSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="3"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; background: #EDEDED; color: #2A2A2A; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WAccess.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>Access rules</a>
+      <a href="WSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #EDEDED; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.08)">
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #EDEDED; color: #2A2A2A; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 800">Meena Krishnan</span><span style="font-size: 11px; color: #EDEDED">HR Admin · all locations</span></div>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+      <div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 14px; font-weight: 600">Publish, version, and see who has read what</span>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -0.8px">HR policies</h1>
+      </div>
+      <a href="WPolicyEditor.dc.html" style="display: flex; align-items: center; height: 46px; padding: 0 18px; border-radius: 16px; background: #A32330; color: #FFFFFF; font-weight: 800; font-size: 14px; text-decoration: none">+ New policy</a>
+    </header>
+
+    <section style="background: #FFFFFF; border: 1px solid #EDEDED; border-radius: 24px; overflow: hidden">
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 860px">
+          <thead><tr style="text-align: left; font-size: 12px"><th style="padding: 16px 22px; font-weight: 800">Policy</th><th style="padding: 16px 10px; font-weight: 800">Version</th><th style="padding: 16px 10px; font-weight: 800">Who it’s for</th><th style="padding: 16px 10px; font-weight: 800">Status</th><th style="padding: 16px 10px; font-weight: 800; width: 220px">Acknowledged</th><th style="padding: 16px 22px"><span style="position: absolute; left: -9999px">Actions</span></th></tr></thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="p" hint-placeholder-count="6">
+              <tr style="border-top: 1px solid #EDEDED">
+                <td style="padding: 12px 22px"><a href="WPolicyEditor.dc.html" style="font-weight: 800; text-decoration: none; color: #2A2A2A">{{p.title}}</a><div style="font-size: 12px; margin-top: 2px">{{p.cat}} · {{p.when}}</div></td>
+                <td style="padding: 12px 10px; font-weight: 700">{{p.ver}}</td>
+                <td style="padding: 12px 10px">{{p.aud}}</td>
+                <td style="padding: 12px 10px"><span style="{{p.chip}}">{{p.status}}</span></td>
+                <td style="padding: 12px 10px"><span style="display: flex; align-items: center; gap: 10px"><span style="flex: 1; height: 8px; border-radius: 4px; background: #EDEDED"><span style="{{p.bar}}"></span></span><span style="font-size: 13px; font-weight: 800; white-space: nowrap">{{p.ack}}</span></span></td>
+                <td style="padding: 8px 22px; text-align: right"><button type="button" onClick="{{p.remind}}" style="{{p.btnStyle}}">{{p.btn}}</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #EDEDED; border-radius: 24px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">Still to acknowledge WFH v3</h2>
+        <span style="font-size: 13px; font-weight: 800; color: #A32330">Due 14 Oct</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; font-weight: 700">
+        <span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">Priya Raman</span><span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">Vikram Rao</span><span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">Sneha Iyer</span><span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">Nikhil Joshi</span><span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">Imran Khan</span><span style="padding: 7px 12px; border-radius: 999px; background: #EDEDED">+6 more</span>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { reminded: {} };
+  }
+  renderVals() {
+    const all = [
+      { id: 1, title: 'Work From Home Policy', cat: 'Work', when: 'published 30 Sep', ver: 'v3', aud: 'Everyone', status: 'Published', done: 37, total: 48 },
+      { id: 2, title: 'Leave Policy 2026', cat: 'Leave', when: 'published 2 Jan', ver: 'v2', aud: 'Everyone', status: 'Published', done: 48, total: 48 },
+      { id: 3, title: 'Code of Conduct', cat: 'Conduct', when: 'published 15 Mar', ver: 'v4', aud: 'Everyone', status: 'Published', done: 47, total: 48 },
+      { id: 4, title: 'POSH Policy', cat: 'Conduct', when: 'published 10 Feb', ver: 'v2', aud: 'Everyone', status: 'Published', done: 48, total: 48 },
+      { id: 5, title: 'Travel & Expenses', cat: 'Finance', when: 'published 22 Jul', ver: 'v1', aud: 'Sales, Ops', status: 'Published', done: 0, total: 0 },
+      { id: 6, title: 'Hybrid Office Attendance', cat: 'Work', when: 'edited 5 Oct', ver: 'v1', aud: 'Chennai', status: 'Draft', done: 0, total: 0 }
+    ];
+    const r = this.state.reminded;
+    return {
+      rows: all.map((p) => {
+        const missing = p.total - p.done;
+        const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
+        const canRemind = missing > 0 && !r[p.id];
+        return {
+          ...p,
+          ack: p.total ? p.done + ' / ' + p.total : (p.status === 'Draft' ? 'Not published' : 'Not required'),
+          bar: 'display: block; height: 8px; border-radius: 4px; width: ' + pct + '%; background: ' + (pct === 100 ? '#2A2A2A' : '#A32330') + ';',
+          chip: 'font-size: 12px; font-weight: 800; padding: 5px 11px; border-radius: 999px; ' + (p.status === 'Draft' ? 'background: #EDEDED; color: #2A2A2A;' : 'background: #2A2A2A; color: #FFFFFF;'),
+          btn: p.status === 'Draft' ? 'Edit' : canRemind ? 'Remind ' + missing : (r[p.id] ? 'Reminded' : 'View'),
+          btnStyle: 'height: 38px; padding: 0 14px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; ' + (canRemind ? 'background: #A32330; color: #FFFFFF; border: 0;' : 'background: #FFFFFF; color: #2A2A2A; border: 1px solid #EDEDED;'),
+          remind: () => { if (canRemind) this.setState({ reminded: { ...r, [p.id]: true } }); }
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

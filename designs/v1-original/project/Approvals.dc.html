@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Approvals</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 24px 12px 8px; flex-shrink: 0">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #161A22; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800; flex: 1">Approvals</h1>
+    <span style="font-size: 13px; font-weight: 700; color: #9A4A06; background: #FDF0E1; padding: 6px 12px; border-radius: 999px; margin-right: 8px">{{pendingCount}} pending</span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 4px 20px 16px; overflow: hidden">
+    <sc-for list="{{reqs}}" as="r" hint-placeholder-count="3">
+      <article style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: #DCE3F0; color: #2B3445; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0">{{r.initials}}</div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 15px; font-weight: 700">{{r.name}}</span>
+            <span style="font-size: 12px; color: #5B6472">{{r.role}}</span>
+          </div>
+          <span style="{{r.chipStyle}}">{{r.statusLabel}}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #F4F5F7; border-radius: 12px; padding: 12px">
+          <span style="font-size: 14px; font-weight: 700">{{r.type}} · {{r.days}}</span>
+          <span style="font-size: 13px; color: #3B4250">{{r.dates}}</span>
+          <span style="font-size: 13px; color: #5B6472">“{{r.reason}}”</span>
+        </div>
+        <span style="font-size: 12px; color: #5B6472">{{r.meta}}</span>
+        <sc-if value="{{r.open}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; gap: 10px">
+            <button type="button" onClick="{{r.reject}}" style="flex: 1; height: 46px; border-radius: 12px; border: 1px solid #E8B4AE; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #B42318">Reject</button>
+            <button type="button" onClick="{{r.approve}}" style="flex: 1; height: 46px; border-radius: 12px; border: 0; background: #0B6B63; font: inherit; font-size: 14px; font-weight: 700; color: #FFFFFF">Approve</button>
+          </div>
+        </sc-if>
+      </article>
+    </sc-for>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { status: {} };
+  }
+  renderVals() {
+    const list = [
+      { id: 1, initials: 'KS', name: 'Karthik S', role: 'Senior Engineer · Atlas', type: 'Casual leave', days: '1 day', dates: 'Fri, 9 Oct 2026', reason: 'Bank work', meta: 'Balance after: 5 CL · Nobody else off that day' },
+      { id: 2, initials: 'DN', name: 'Divya Nair', role: 'QA Engineer · Atlas', type: 'Earned leave', days: '5 days', dates: 'Mon 2 – Fri 6 Nov 2026', reason: 'Travelling home for Diwali', meta: 'Balance after: 9 EL · Overlaps with 1 teammate' },
+      { id: 3, initials: 'RV', name: 'Rahul Verma', role: 'Designer · HR Suite', type: 'Sick leave', days: '½ day', dates: 'Tue, 6 Oct 2026 · second half', reason: 'Doctor appointment', meta: 'Applied after the fact · Balance after: 9.5 SL' }
+    ];
+    const base = 'font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; ';
+    const st = this.state.status;
+    return {
+      pendingCount: list.filter((r) => !st[r.id]).length,
+      reqs: list.map((r) => {
+        const s = st[r.id];
+        return {
+          ...r,
+          open: !s,
+          statusLabel: s === 'ok' ? 'Approved' : s === 'no' ? 'Rejected' : 'Pending',
+          chipStyle: base + (s === 'ok' ? 'color: #146C43; background: #E4F3EA;' : s === 'no' ? 'color: #B42318; background: #FBE7E5;' : 'color: #9A4A06; background: #FDF0E1;'),
+          approve: () => this.setState({ status: { ...st, [r.id]: 'ok' } }),
+          reject: () => this.setState({ status: { ...st, [r.id]: 'no' } })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

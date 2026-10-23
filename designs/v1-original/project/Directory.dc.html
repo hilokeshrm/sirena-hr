@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team directory</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; flex-direction: column; gap: 12px; padding: 28px 20px 8px; flex-shrink: 0">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.3px">Team</h1>
+      <span style="font-size: 13px; color: #5B6472; font-weight: 600">48 people</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; height: 48px; background: #FFFFFF; border: 1px solid #C9CED6; border-radius: 12px; padding: 0 14px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6472" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <label for="dq" style="position: absolute; left: -9999px">Search people</label>
+      <input id="dq" type="search" value="{{q}}" onInput="{{onQ}}" placeholder="Name, role or department" style="flex: 1; border: 0; outline: none; font: inherit; font-size: 14px; background: transparent">
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 8px 20px 16px; overflow: hidden">
+    <h2 style="margin: 4px 0 6px; font-size: 12px; font-weight: 800; color: #5B6472; letter-spacing: 0.5px">MY TEAM · REPORTS TO ARJUN MEHTA</h2>
+    <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden">
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="7">
+        <a href="Profile.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 60px; box-sizing: border-box; text-decoration: none; color: #161A22; border-bottom: 1px solid #EEF0F3">
+          <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #DCE3F0; color: #2B3445; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">{{p.initials}}</div>
+            <span style="{{p.dot}}"></span>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 14px; font-weight: 700">{{p.name}}</span>
+            <span style="font-size: 12px; color: #5B6472">{{p.role}}</span>
+          </div>
+          <span style="font-size: 12px; font-weight: 600; color: {{p.statusColor}}">{{p.status}}</span>
+        </a>
+      </sc-for>
+      <sc-if value="{{none}}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 20px; font-size: 14px; color: #5B6472; text-align: center">No one matches “{{q}}”.</div>
+      </sc-if>
+    </div>
+  </main>
+
+  <nav aria-label="Main" style="display: flex; justify-content: space-around; align-items: center; height: 76px; background: #FFFFFF; border-top: 1px solid #E3E6EB; padding: 0 8px 12px; box-sizing: border-box; flex-shrink: 0">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>Home</a>
+    <a href="Leave.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave</a>
+    <a href="Policies.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+    <a href="Directory.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #0B6B63; font-size: 11px; font-weight: 700">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Team</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px; min-height: 48px; text-decoration: none; color: #5B6472; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>Me</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { q: '' };
+  }
+  renderVals() {
+    const all = [
+      { initials: 'AM', name: 'Arjun Mehta', role: 'Engineering Manager', off: false },
+      { initials: 'KS', name: 'Karthik S', role: 'Senior Engineer', off: false },
+      { initials: 'DN', name: 'Divya Nair', role: 'QA Engineer', off: false },
+      { initials: 'RV', name: 'Rahul Verma', role: 'Product Designer', off: false },
+      { initials: 'SI', name: 'Sneha Iyer', role: 'Backend Engineer', off: true },
+      { initials: 'VR', name: 'Vikram Rao', role: 'Mobile Engineer', off: true },
+      { initials: 'AD', name: 'Ananya Das', role: 'Frontend Engineer', off: false }
+    ];
+    const q = this.state.q.trim().toLowerCase();
+    const people = all.filter((p) => !q || (p.name + ' ' + p.role).toLowerCase().includes(q)).map((p) => ({
+      ...p,
+      status: p.off ? 'On leave' : 'In today',
+      statusColor: p.off ? '#9A4A06' : '#146C43',
+      dot: 'position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #FFFFFF; box-sizing: border-box; background: ' + (p.off ? '#C2570C' : '#1E8E57') + ';'
+    }));
+    return {
+      q: this.state.q,
+      onQ: (e) => this.setState({ q: e.target.value }),
+      people,
+      none: people.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

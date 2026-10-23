@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apply leave</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#A32330}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 10px; padding: 22px 16px 10px; flex-shrink: 0">
+    <a href="Leave.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #2A2A2A">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800">Take a break</h1>
+  </header>
+
+  <form style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 4px 20px 20px; overflow: hidden">
+    <fieldset style="border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+      <legend style="font-size: 13px; font-weight: 800; color: #2A2A2A; padding: 0; margin-bottom: 8px">What kind?</legend>
+      <sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+        <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800; line-height: 1">{{t.bal}}</span>
+          <span style="font-size: 11px; font-weight: 800">{{t.label}}</span>
+        </button>
+      </sc-for>
+    </fieldset>
+
+    <section aria-label="Dates" style="background: #FFFFFF; border: 1px solid #EDEDED; border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; background: #EDEDED; border-radius: 16px; padding: 10px 12px">
+          <label for="from" style="font-size: 11px; font-weight: 800; color: #2A2A2A">FROM</label>
+          <input id="from" type="text" value="Mon, 26 Oct" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 16px; font-weight: 800; color: #2A2A2A; min-width: 0">
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A32330" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; background: #EDEDED; border-radius: 16px; padding: 10px 12px">
+          <label for="to" style="font-size: 11px; font-weight: 800; color: #2A2A2A">TO</label>
+          <input id="to" type="text" value="Wed, 28 Oct" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 16px; font-weight: 800; color: #2A2A2A; min-width: 0">
+        </div>
+      </div>
+      <div aria-label="Week of 26 October" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center">
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">M</span><span style="width: 36px; height: 36px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px">26</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">T</span><span style="width: 36px; height: 36px; border-radius: 12px; background: {{midBg}}; color: {{midFg}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px">27</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">W</span><span style="width: 36px; height: 36px; border-radius: 12px; background: {{midBg}}; color: {{midFg}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px">28</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">T</span><span style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">29</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">F</span><span style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">30</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">S</span><span style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #2A2A2A">31</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center"><span style="font-size: 11px; font-weight: 700; color: #2A2A2A">S</span><span style="width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; color: #2A2A2A">1</span></div>
+      </div>
+      <label style="display: flex; align-items: center; justify-content: space-between; min-height: 44px; border-top: 1px solid #EDEDED; padding-top: 10px; font-size: 14px; font-weight: 700">
+        Just half a day
+        <span style="position: relative; display: inline-flex">
+          <input type="checkbox" checked="{{half}}" onChange="{{toggleHalf}}" style="position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer">
+          <span style="{{switchStyle}}"><span style="{{knobStyle}}"></span></span>
+        </span>
+      </label>
+    </section>
+
+    <section style="position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; background: #EDEDED; border-radius: 22px; padding: 14px 16px">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 800; line-height: 1">{{days}}</span>
+      <span style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 14px; font-weight: 800">{{daysLabel}}</span>
+        <span style="font-size: 12px; color: #2A2A2A">{{after}} left after this · no holidays in range</span>
+      </span>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="reason" style="font-size: 13px; font-weight: 800; color: #2A2A2A">A quick note for your manager</label>
+      <textarea id="reason" rows="2" style="border: 0; border-radius: 18px; padding: 12px 14px; font: inherit; font-size: 14px; resize: none; background: #FFFFFF">Family function in Madurai</textarea>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: #2A2A2A">
+        <span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDED; color: #2A2A2A; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center">AM</span>
+        Goes to <strong style="color: #2A2A2A">Arjun Mehta</strong>, then HR
+      </div>
+      <a href="LeaveDetail.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 18px; background: #2A2A2A; color: #FFFFFF; font-weight: 800; font-size: 16px; text-decoration: none">Send request
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EDEDED" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { type: 'EL', half: false };
+  }
+  renderVals() {
+    const defs = [
+      { id: 'CL', label: 'Casual', bal: 8, bg: '#EDEDED', on: '#A32330' },
+      { id: 'SL', label: 'Sick', bal: 10, bg: '#EDEDED', on: '#A32330' },
+      { id: 'EL', label: 'Earned', bal: 14.5, bg: '#EDEDED', on: '#2A2A2A' },
+      { id: 'CO', label: 'Comp-off', bal: 1, bg: '#EDEDED', on: '#2A2A2A' }
+    ];
+    const cur = defs.find((d) => d.id === this.state.type);
+    const half = this.state.half;
+    const days = half ? 0.5 : 3;
+    return {
+      types: defs.map((d) => {
+        const on = d.id === this.state.type;
+        return {
+          ...d,
+          pressed: on ? 'true' : 'false',
+          pick: () => this.setState({ type: d.id }),
+          style: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 72px; border-radius: 20px; font: inherit; cursor: pointer; border: 0; ' + (on ? 'background: ' + d.on + '; color: #FFFFFF; box-shadow: 0 8px 18px rgba(42,42,42,0.18);' : 'background: ' + d.bg + '; color: #2A2A2A;')
+        };
+      }),
+      accent: cur.on,
+      midBg: half ? 'transparent' : cur.on,
+      midFg: half ? '#2A2A2A' : '#FFFFFF',
+      half,
+      toggleHalf: () => this.setState({ half: !half }),
+      switchStyle: 'width: 52px; height: 30px; border-radius: 999px; display: flex; align-items: center; padding: 3px; box-sizing: border-box; ' + (half ? 'background: #A32330; justify-content: flex-end;' : 'background: #EDEDED; justify-content: flex-start;'),
+      knobStyle: 'width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.2);',
+      days: days,
+      daysLabel: half ? 'half day of ' + cur.label.toLowerCase() : 'working days of ' + cur.label.toLowerCase(),
+      after: Math.max(cur.bal - days, 0)
+    };
+  }
+}
+</script>
+</body>
+</html>

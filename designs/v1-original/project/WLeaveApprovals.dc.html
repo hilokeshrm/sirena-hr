@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Leave approvals</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22">
+  <aside style="flex: 1 1 232px; background: #10302D; color: #FFFFFF; display: flex; flex-direction: column; gap: 20px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: #FFFFFF; color: #0B6B63; display: flex; align-items: center; justify-content: center; font-weight: 800">S</div>
+      <span style="font-size: 17px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WProjects.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; background: #1F4D48; color: #FFFFFF; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #F2B66D; color: #3A2205; padding: 2px 8px; border-radius: 999px">{{pending}}</span></a>
+      <a href="WLeaveSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave types &amp; rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Users &amp; settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #24504B">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #F2B66D; color: #3A2205; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 700">Meena Krishnan</span><span style="font-size: 12px; color: #C5D8D5">HR Admin</span></div>
+    </div>
+  </aside>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+      <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px">
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800">Leave approvals</h1>
+        <span style="font-size: 13px; color: #5B6472">{{pending}} pending · requests reach HR after the manager approves</span>
+      </div>
+      <button type="button" style="height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Export CSV</button>
+    </header>
+
+    <main style="padding: 24px 32px 40px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 3 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; overflow: hidden">
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 620px">
+            <thead><tr style="text-align: left; color: #5B6472; font-size: 12px; background: #FAFBFC"><th style="padding: 12px 20px">Employee</th><th style="padding: 12px">Type</th><th style="padding: 12px">Dates</th><th style="padding: 12px">Days</th><th style="padding: 12px">Stage</th><th style="padding: 12px 20px">Status</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+                <tr style="{{r.rowStyle}}">
+                  <td style="padding: 0 20px"><button type="button" onClick="{{r.pick}}" style="min-height: 52px; border: 0; background: transparent; padding: 0; font: inherit; font-size: 14px; font-weight: 700; color: #161A22; text-align: left; cursor: pointer">{{r.name}}</button></td>
+                  <td style="padding: 12px">{{r.type}}</td>
+                  <td style="padding: 12px">{{r.dates}}</td>
+                  <td style="padding: 12px">{{r.days}}</td>
+                  <td style="padding: 12px; color: #3B4250">{{r.stage}}</td>
+                  <td style="padding: 12px 20px"><span style="{{r.chip}}">{{r.status}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-label="Request detail" style="flex: 2 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #DCE3F0; color: #2B3445; display: flex; align-items: center; justify-content: center; font-weight: 800">{{sel.initials}}</div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 17px; font-weight: 800">{{sel.name}}</span>
+            <span style="font-size: 13px; color: #5B6472">{{sel.role}}</span>
+          </div>
+          <span style="{{sel.chip}}">{{sel.status}}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; background: #F4F5F7; border-radius: 12px; padding: 14px">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5B6472">Type</span><span style="font-size: 14px; font-weight: 700">{{sel.type}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5B6472">Days</span><span style="font-size: 14px; font-weight: 700">{{sel.days}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px; grid-column: 1 / -1"><span style="font-size: 12px; color: #5B6472">Dates</span><span style="font-size: 14px; font-weight: 700">{{sel.dates}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5B6472">Balance now</span><span style="font-size: 14px; font-weight: 700">{{sel.balance}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5B6472">Manager</span><span style="font-size: 14px; font-weight: 700">{{sel.mgr}}</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6472">Reason</span><span style="font-size: 14px">{{sel.reason}}</span></div>
+        <div style="display: flex; gap: 10px; align-items: flex-start; background: #FDF0E1; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #6B3504">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16v.5"></path></svg>
+          <span>{{sel.note}}</span>
+        </div>
+        <sc-if value="{{sel.open}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="cm" style="font-size: 12px; font-weight: 700; color: #3B4250">Comment (sent to employee)</label>
+            <textarea id="cm" rows="2" placeholder="Optional" style="border: 1px solid #C9CED6; border-radius: 10px; padding: 10px; font: inherit; font-size: 14px; resize: vertical"></textarea>
+          </div>
+          <div style="display: flex; gap: 10px">
+            <button type="button" onClick="{{reject}}" style="flex: 1; height: 46px; border-radius: 10px; border: 1px solid #E8B4AE; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #B42318">Reject</button>
+            <button type="button" onClick="{{approve}}" style="flex: 1; height: 46px; border-radius: 10px; border: 0; background: #0B6B63; font: inherit; font-size: 14px; font-weight: 700; color: #FFFFFF">Approve</button>
+          </div>
+        </sc-if>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 3, done: {} };
+  }
+  renderVals() {
+    const reqs = [
+      { id: 1, initials: 'KS', name: 'Karthik S', role: 'Senior Engineer · Engineering', type: 'Casual', dates: 'Fri, 9 Oct 2026', days: '1', stage: 'Manager', mgr: 'Arjun Mehta', balance: '6 CL', reason: 'Bank work', note: 'No overlap with teammates.' },
+      { id: 2, initials: 'DN', name: 'Divya Nair', role: 'QA Engineer · Engineering', type: 'Earned', dates: 'Mon 2 – Fri 6 Nov 2026', days: '5', stage: 'Manager', mgr: 'Arjun Mehta', balance: '14 EL', reason: 'Travelling home for Diwali', note: 'Overlaps with 1 teammate on Atlas Mobile Revamp.' },
+      { id: 3, initials: 'RP', name: 'Rohan Pillai', role: 'Ops Lead · Operations', type: 'Sick', dates: 'Mon 5 – Tue 6 Oct 2026', days: '2', stage: 'HR', mgr: 'Ravi Shankar (approved)', balance: '7 SL', reason: 'Viral fever, medical certificate attached', note: 'Waiting on HR for 50 hours. Applied after the dates; certificate is attached.' },
+      { id: 4, initials: 'FS', name: 'Fatima Sheikh', role: 'Sales Manager · Sales', type: 'Maternity', dates: 'Mon 2 Nov 2026 – Sun 2 May 2027', days: '182', stage: 'HR', mgr: 'Pooja Shah (approved)', balance: '182 ML', reason: 'Maternity leave', note: 'Statutory leave. Calendar days are counted, including weekends and holidays.' },
+      { id: 5, initials: 'LM', name: 'Lakshmi Menon', role: 'Designer · Design', type: 'Casual', dates: 'Wed, 7 Oct 2026', days: '1', stage: 'Done', mgr: 'Neha Gupta', balance: '4 CL', reason: 'Personal', note: 'Approved by manager and HR.', status: 'Approved' },
+      { id: 6, initials: 'IK', name: 'Imran Khan', role: 'Account Exec · Sales', type: 'Earned', dates: 'Mon 21 – Fri 25 Sep 2026', days: '5', stage: 'Done', mgr: 'Pooja Shah', balance: '3 EL', reason: 'Vacation', note: 'Rejected: quarter-end freeze.', status: 'Rejected' }
+    ];
+    const chipStyle = {
+      Pending: 'color: #9A4A06; background: #FDF0E1;',
+      Approved: 'color: #146C43; background: #E4F3EA;',
+      Rejected: 'color: #B42318; background: #FBE7E5;'
+    };
+    const chipBase = 'font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; ';
+    const done = this.state.done;
+    const withStatus = reqs.map((r) => {
+      const status = done[r.id] || r.status || 'Pending';
+      return { ...r, status, chip: chipBase + chipStyle[status], open: status === 'Pending' };
+    });
+    const sel = withStatus.find((r) => r.id === this.state.sel);
+    return {
+      pending: withStatus.filter((r) => r.status === 'Pending').length,
+      rows: withStatus.map((r) => ({
+        ...r,
+        pick: () => this.setState({ sel: r.id }),
+        rowStyle: 'border-top: 1px solid #EEF0F3; ' + (r.id === this.state.sel ? 'background: #E3F1EF; box-shadow: inset 4px 0 0 #0B6B63;' : '')
+      })),
+      sel,
+      approve: () => this.setState({ done: { ...done, [sel.id]: 'Approved' } }),
+      reject: () => this.setState({ done: { ...done, [sel.id]: 'Rejected' } })
+    };
+  }
+}
+</script>
+</body>
+</html>

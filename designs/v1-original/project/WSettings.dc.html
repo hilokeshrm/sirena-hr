@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Users, roles and settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22">
+  <aside style="flex: 1 1 232px; background: #10302D; color: #FFFFFF; display: flex; flex-direction: column; gap: 20px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: #FFFFFF; color: #0B6B63; display: flex; align-items: center; justify-content: center; font-weight: 800">S</div>
+      <span style="font-size: 17px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WProjects.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #F2B66D; color: #3A2205; padding: 2px 8px; border-radius: 999px">6</span></a>
+      <a href="WLeaveSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave types &amp; rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #C5D8D5; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WSettings.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; background: #1F4D48; color: #FFFFFF; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Users &amp; settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #24504B">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #F2B66D; color: #3A2205; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 700">Meena Krishnan</span><span style="font-size: 12px; color: #C5D8D5">HR Admin</span></div>
+    </div>
+  </aside>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; flex-direction: column; gap: 14px; padding: 18px 32px 0; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px">
+          <h1 style="margin: 0; font-size: 22px; font-weight: 800">Users &amp; settings</h1>
+          <span style="font-size: 13px; color: #5B6472">Admin only</span>
+        </div>
+      </div>
+      <div role="tablist" aria-label="Settings sections" style="display: flex; gap: 4px; overflow-x: auto">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+          <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+    </header>
+
+    <main style="padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px">
+      <sc-if value="{{isRoles}}" hint-placeholder-val="{{ true }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; overflow: hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 800">What each role can do</h2>
+            <span style="font-size: 13px; color: #5B6472">Managers see only their own reports</span>
+          </div>
+          <div style="overflow-x: auto">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px">
+              <thead><tr style="text-align: left; color: #5B6472; font-size: 12px; background: #FAFBFC"><th style="padding: 12px 20px">Permission</th><th style="padding: 12px; text-align: center">Employee</th><th style="padding: 12px; text-align: center">Manager</th><th style="padding: 12px; text-align: center">HR</th><th style="padding: 12px 20px; text-align: center">Admin</th></tr></thead>
+              <tbody>
+                <sc-for list="{{perms}}" as="p" hint-placeholder-count="8">
+                  <tr style="border-top: 1px solid #EEF0F3">
+                    <td style="padding: 11px 20px; font-weight: 600">{{p.name}}</td>
+                    <td style="padding: 11px 12px; text-align: center; font-weight: 700; color: {{p.c0}}">{{p.v0}}</td>
+                    <td style="padding: 11px 12px; text-align: center; font-weight: 700; color: {{p.c1}}">{{p.v1}}</td>
+                    <td style="padding: 11px 12px; text-align: center; font-weight: 700; color: {{p.c2}}">{{p.v2}}</td>
+                    <td style="padding: 11px 20px; text-align: center; font-weight: 700; color: {{p.c3}}">{{p.v3}}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; overflow: hidden">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 800">Admins &amp; HR users</h2>
+            <button type="button" style="height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Invite user</button>
+          </div>
+          <div style="overflow-x: auto">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px">
+              <thead><tr style="text-align: left; color: #5B6472; font-size: 12px; background: #FAFBFC"><th style="padding: 12px 20px">User</th><th style="padding: 12px">Role</th><th style="padding: 12px">2-step sign-in</th><th style="padding: 12px 20px">Last active</th></tr></thead>
+              <tbody>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 11px 20px; font-weight: 700">Ravi Shankar</td><td style="padding: 11px 12px">Admin</td><td style="padding: 11px 12px; color: #146C43; font-weight: 700">On</td><td style="padding: 11px 20px; color: #3B4250">Yesterday</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 11px 20px; font-weight: 700">Meena Krishnan</td><td style="padding: 11px 12px">HR</td><td style="padding: 11px 12px; color: #146C43; font-weight: 700">On</td><td style="padding: 11px 20px; color: #3B4250">Now</td></tr>
+                <tr style="border-top: 1px solid #EEF0F3"><td style="padding: 11px 20px; font-weight: 700">Swathi Ramesh</td><td style="padding: 11px 12px">HR</td><td style="padding: 11px 12px; color: #B42318; font-weight: 700">Off</td><td style="padding: 11px 20px; color: #3B4250">3 days ago</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isCompany}}" hint-placeholder-val="{{ false }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c1" style="font-size: 12px; font-weight: 700; color: #3B4250">Company name</label><input id="c1" value="Sirena Technologies" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c2" style="font-size: 12px; font-weight: 700; color: #3B4250">Employee code prefix</label><input id="c2" value="SIR-" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c3" style="font-size: 12px; font-weight: 700; color: #3B4250">Working days</label><input id="c3" value="Monday – Friday" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c4" style="font-size: 12px; font-weight: 700; color: #3B4250">Time zone</label><select id="c4" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF; min-width: 0"><option>Asia/Kolkata (IST)</option></select></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c5" style="font-size: 12px; font-weight: 700; color: #3B4250">Locations</label><input id="c5" value="Chennai, Bengaluru, Remote" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; min-width: 0"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="c6" style="font-size: 12px; font-weight: 700; color: #3B4250">Leave year starts</label><select id="c6" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; background: #FFFFFF; min-width: 0"><option>January</option><option>April</option></select></div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isNotify}}" hint-placeholder-val="{{ false }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0 0 6px; font-size: 16px; font-weight: 800">Send notifications for</h2>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">New leave request (to approver) · push + email</label>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Leave approved or rejected (to employee) · push</label>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Policy published or updated · push + email</label>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Document expiring in 30 days · email</label>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Daily “who’s off today” digest · email</label>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-width: 420px; margin-top: 8px"><label for="smtp" style="font-size: 12px; font-weight: 700; color: #3B4250">Outgoing mail (SMTP host)</label><input id="smtp" value="smtp.[your-provider].com" style="height: 40px; border: 1px solid #C9CED6; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px"></div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isSecurity}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+          <section style="flex: 1 1 360px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 800">Server</h2>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Public address</span><span style="font-weight: 700">https://hr.[your-domain]</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">HTTPS certificate</span><span style="font-weight: 700; color: #146C43">Valid · renews automatically</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Database</span><span style="font-weight: 700">PostgreSQL · local only</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Storage used</span><span style="font-weight: 700">[used] of [total]</span></div>
+          </section>
+          <section style="flex: 1 1 360px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 800">Backups</h2>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Schedule</span><span style="font-weight: 700">Nightly, 02:00 IST</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Last backup</span><span style="font-weight: 700; color: #146C43">Today 02:00 · OK</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #5B6472">Off-site copy</span><span style="font-weight: 700">[backup destination]</span></div>
+            <div style="display: flex; gap: 10px; margin-top: 4px">
+              <button type="button" style="height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Back up now</button>
+              <button type="button" style="height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid #C9CED6; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Restore…</button>
+            </div>
+          </section>
+          <section style="flex: 1 1 360px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+            <h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 800">Sign-in security</h2>
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Require 2-step sign-in for Admin and HR</label>
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Lock account after 5 failed attempts</label>
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #0B6B63; margin: 0">Sign out web sessions after 8 hours</label>
+          </section>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'roles' };
+  }
+  renderVals() {
+    const defs = [['roles', 'Roles & access'], ['company', 'Company'], ['notify', 'Notifications'], ['security', 'Server, backups & security']];
+    const t = this.state.tab;
+    const Y = 'Yes', N = '—', T = 'Team';
+    const rows = [
+      ['View own profile & leave', Y, Y, Y, Y],
+      ['Apply for leave', Y, Y, Y, Y],
+      ['Approve leave', N, T, Y, Y],
+      ['View team calendar', T, T, Y, Y],
+      ['Edit employee records', N, N, Y, Y],
+      ['Manage projects & allocation', N, T, Y, Y],
+      ['Publish policies', N, N, Y, Y],
+      ['Leave types, holidays & rules', N, N, Y, Y],
+      ['Users, roles & backups', N, N, N, Y]
+    ];
+    const col = (v) => v === Y ? '#146C43' : v === T ? '#2649B5' : '#5B6472';
+    return {
+      tabs: defs.map(([id, label]) => ({
+        label,
+        sel: t === id ? 'true' : 'false',
+        pick: () => this.setState({ tab: id }),
+        style: 'height: 44px; padding: 0 16px; border: 0; background: transparent; font: inherit; font-size: 14px; white-space: nowrap; ' + (t === id ? 'border-bottom: 3px solid #0B6B63; color: #0B6B63; font-weight: 800;' : 'border-bottom: 3px solid transparent; color: #3B4250; font-weight: 600;')
+      })),
+      perms: rows.map((r) => ({ name: r[0], v0: r[1], v1: r[2], v2: r[3], v3: r[4], c0: col(r[1]), c1: col(r[2]), c2: col(r[3]), c3: col(r[4]) })),
+      isRoles: t === 'roles',
+      isCompany: t === 'company',
+      isNotify: t === 'notify',
+      isSecurity: t === 'security'
+    };
+  }
+}
+</script>
+</body>
+</html>

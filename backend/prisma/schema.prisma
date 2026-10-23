@@ -1,0 +1,501 @@
+// Sirena HR — database schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── People & org ─────────────────────────
+
+enum Role {
+  EMPLOYEE
+  HR
+  HR_ADMIN
+  FINANCE
+  SUPER_ADMIN
+}
+
+enum EmployeeStatus {
+  ONBOARDING
+  ACTIVE
+  ON_NOTICE
+  EXITED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  CONTRACT
+  INTERN
+  CONSULTANT
+}
+
+enum WorkMode {
+  OFFICE
+  HYBRID
+  REMOTE
+}
+
+enum FoodPref {
+  VEG
+  NON_VEG
+}
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Location {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  employees Employee[]
+  networks  OfficeNetwork[]
+  holidays  Holiday[]
+}
+
+/// Office Wi-Fi used for automatic check-in. A check-in counts as "office"
+/// when the request comes from `publicIp` and/or the phone reports a matching BSSID.
+model OfficeNetwork {
+  id         String   @id @default(cuid())
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  ssid       String
+  bssids     String[]
+  publicIp   String?
+}
+
+model Employee {
+  id                String         @id @default(cuid())
+  code              String         @unique
+  email             String         @unique
+  passwordHash      String?
+  role              Role           @default(EMPLOYEE)
+  status            EmployeeStatus @default(ACTIVE)
+
+  fullName          String
+  preferredName     String?
+  dateOfBirth       DateTime?      @db.Date
+  gender            String?
+  bloodGroup        String?
+  foodPref          FoodPref?
+
+  personalEmail     String?
+  phone             String?
+  address           String?
+  emergencyName     String?
+  emergencyRelation String?
+  emergencyPhone    String?
+
+  departmentId      String?
+  department        Department?    @relation(fields: [departmentId], references: [id])
+  designation       String?
+  locationId        String?
+  location          Location?      @relation(fields: [locationId], references: [id])
+  workMode          WorkMode       @default(HYBRID)
+  employmentType    EmploymentType @default(FULL_TIME)
+  joinedOn          DateTime?      @db.Date
+
+  managerId         String?
+  manager           Employee?      @relation("Reports", fields: [managerId], references: [id])
+  reports           Employee[]     @relation("Reports")
+
+  qualification     String?
+  experienceYears   Decimal?       @db.Decimal(4, 1)
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  leaveRequests     LeaveRequest[]
+  leaveLedger       LeaveLedger[]
+  approvals         LeaveApproval[]
+  attendance        Attendance[]
+  workPlans         WorkPlan[]
+  meals             MealBooking[]
+  memberships       ProjectMember[]
+  leadProjects      Project[]      @relation("ProjectLead")
+  tasks             Task[]
+  files             ProjectFile[]
+  acks              PolicyAck[]
+  notifications     Notification[]
+}
+
+// ───────────────────────── Leave ─────────────────────────
+
+enum Accrual {
+  MONTHLY
+  UPFRONT
+  NONE
+}
+
+enum HrApproval {
+  ALWAYS
+  NEVER
+  ABOVE_DAYS
+}
+
+enum HalfDay {
+  NONE
+  FIRST
+  SECOND
+}
+
+enum LeaveStatus {
+  PENDING_MANAGER
+  PENDING_HR
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LedgerReason {
+  ACCRUAL
+  OPENING
+  TAKEN
+  REVERSAL
+  ADJUSTMENT
+  CARRY_FORWARD
+  LAPSE
+}
+
+model LeaveType {
+  id                  String         @id @default(cuid())
+  code                String         @unique
+  name                String
+  yearlyQuota         Decimal?       @db.Decimal(5, 1)
+  accrual             Accrual        @default(MONTHLY)
+  carryForwardMax     Decimal        @default(0) @db.Decimal(5, 1)
+  allowHalfDay        Boolean        @default(true)
+  allowNegative       Boolean        @default(false)
+  minNoticeDays       Int            @default(0)
+  maxConsecutiveDays  Int?
+  sandwich            Boolean        @default(false)
+  hrApproval          HrApproval     @default(ABOVE_DAYS)
+  hrApprovalAboveDays Int            @default(3)
+  active              Boolean        @default(true)
+  requests            LeaveRequest[]
+  ledger              LeaveLedger[]
+}
+
+/// Every credit and debit is a row; balance = SUM(delta).
+model LeaveLedger {
+  id          String       @id @default(cuid())
+  employeeId  String
+  employee    Employee     @relation(fields: [employeeId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType    @relation(fields: [leaveTypeId], references: [id])
+  year        Int
+  delta       Decimal      @db.Decimal(5, 1)
+  reason      LedgerReason
+  refId       String?
+  note        String?
+  createdAt   DateTime     @default(now())
+
+  @@index([employeeId, leaveTypeId, year])
+}
+
+model LeaveRequest {
+  id          String          @id @default(cuid())
+  employeeId  String
+  employee    Employee        @relation(fields: [employeeId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType       @relation(fields: [leaveTypeId], references: [id])
+  fromDate    DateTime        @db.Date
+  toDate      DateTime        @db.Date
+  halfDay     HalfDay         @default(NONE)
+  days        Decimal         @db.Decimal(5, 1)
+  reason      String?
+  status      LeaveStatus     @default(PENDING_MANAGER)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  approvals   LeaveApproval[]
+
+  @@index([employeeId, status])
+}
+
+model LeaveApproval {
+  id         String       @id @default(cuid())
+  requestId  String
+  request    LeaveRequest @relation(fields: [requestId], references: [id])
+  step       String // MANAGER | HR
+  approverId String
+  approver   Employee     @relation(fields: [approverId], references: [id])
+  approved   Boolean
+  comment    String?
+  at         DateTime     @default(now())
+}
+
+model Holiday {
+  id         String    @id @default(cuid())
+  date       DateTime  @db.Date
+  name       String
+  optional   Boolean   @default(false)
+  locationId String?
+  location   Location? @relation(fields: [locationId], references: [id])
+
+  @@unique([date, locationId])
+}
+
+// ───────────────────────── Attendance & meals ─────────────────────────
+
+enum DayMode {
+  OFFICE
+  WFH
+}
+
+enum CheckMethod {
+  WIFI
+  MANUAL
+}
+
+model Attendance {
+  id         String      @id @default(cuid())
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id])
+  date       DateTime    @db.Date
+  checkInAt  DateTime
+  checkOutAt DateTime?
+  mode       DayMode
+  method     CheckMethod
+  /// office check-in that could not be matched to an office network
+  flagged    Boolean     @default(false)
+  ip         String?
+  ssid       String?
+  bssid      String?
+
+  @@unique([employeeId, date])
+}
+
+/// Planned work mode per day (drives lunch booking eligibility).
+model WorkPlan {
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  date       DateTime @db.Date
+  mode       DayMode
+
+  @@id([employeeId, date])
+}
+
+enum MealChoice {
+  VEG
+  NON_VEG
+  NONE
+}
+
+enum MealStatus {
+  BOOKED
+  CANCELLED
+  COLLECTED
+}
+
+model MealMenu {
+  id         String   @id @default(cuid())
+  date       DateTime @db.Date
+  locationId String
+  vegMenu    String
+  nonVegMenu String
+
+  @@unique([date, locationId])
+}
+
+model MealBooking {
+  id         String     @id @default(cuid())
+  employeeId String
+  employee   Employee   @relation(fields: [employeeId], references: [id])
+  date       DateTime   @db.Date
+  choice     MealChoice
+  status     MealStatus @default(BOOKED)
+  passCode   String
+  updatedAt  DateTime   @updatedAt
+
+  @@unique([employeeId, date])
+}
+
+// ───────────────────────── Projects ─────────────────────────
+
+enum ProjectStatus {
+  ON_TRACK
+  AT_RISK
+  DELAYED
+  COMPLETED
+}
+
+enum ProjectRole {
+  LEAD
+  TECH_LEAD
+  MEMBER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Sensitivity {
+  NORMAL
+  RESTRICTED
+}
+
+model Project {
+  id         String          @id @default(cuid())
+  code       String          @unique
+  name       String
+  client     String?
+  status     ProjectStatus   @default(ON_TRACK)
+  startDate  DateTime?       @db.Date
+  endDate    DateTime?       @db.Date
+  leadId     String?
+  lead       Employee?       @relation("ProjectLead", fields: [leadId], references: [id])
+  members    ProjectMember[]
+  milestones Milestone[]
+  tasks      Task[]
+  folders    Folder[]
+}
+
+model ProjectMember {
+  projectId  String
+  project    Project     @relation(fields: [projectId], references: [id])
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id])
+  role       ProjectRole @default(MEMBER)
+  allocation Int         @default(100)
+
+  @@id([projectId, employeeId])
+}
+
+model Milestone {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+  name      String
+  dueDate   DateTime? @db.Date
+  done      Boolean   @default(false)
+}
+
+model Task {
+  id         String     @id @default(cuid())
+  projectId  String
+  project    Project    @relation(fields: [projectId], references: [id])
+  title      String
+  status     TaskStatus @default(TODO)
+  priority   Priority   @default(MEDIUM)
+  assigneeId String?
+  assignee   Employee?  @relation(fields: [assigneeId], references: [id])
+  dueDate    DateTime?  @db.Date
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Folder {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     Project       @relation(fields: [projectId], references: [id])
+  name        String
+  sensitivity Sensitivity   @default(NORMAL)
+  files       ProjectFile[]
+}
+
+model ProjectFile {
+  id           String   @id @default(cuid())
+  folderId     String
+  folder       Folder   @relation(fields: [folderId], references: [id])
+  name         String
+  storageKey   String
+  size         Int
+  mime         String
+  version      Int      @default(1)
+  uploadedById String
+  uploadedBy   Employee @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+// ───────────────────────── Policies ─────────────────────────
+
+model Policy {
+  id          String          @id @default(cuid())
+  title       String
+  category    String
+  requireAck  Boolean         @default(true)
+  /// null = everyone; otherwise a location id
+  locationId  String?
+  versions    PolicyVersion[]
+  createdAt   DateTime        @default(now())
+}
+
+model PolicyVersion {
+  id            String      @id @default(cuid())
+  policyId      String
+  policy        Policy      @relation(fields: [policyId], references: [id])
+  version       Int
+  body          String
+  changeSummary String?
+  publishedAt   DateTime?
+  ackDueAt      DateTime?
+  acks          PolicyAck[]
+
+  @@unique([policyId, version])
+}
+
+model PolicyAck {
+  versionId  String
+  version    PolicyVersion @relation(fields: [versionId], references: [id])
+  employeeId String
+  employee   Employee      @relation(fields: [employeeId], references: [id])
+  at         DateTime      @default(now())
+
+  @@id([versionId, employeeId])
+}
+
+// ───────────────────────── Platform ─────────────────────────
+
+model Notification {
+  id         String    @id @default(cuid())
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id])
+  title      String
+  link       String?
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([employeeId, readAt])
+}
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  actorId  String?
+  action   String
+  entity   String
+  entityId String?
+  meta     Json?
+  at       DateTime @default(now())
+
+  @@index([entity, entityId])
+}
+
+/// Accounts are invite-only. HR creates the employee and an invite; the
+/// person sets their password and fills personal details when accepting.
+model Invite {
+  token      String    @id
+  employeeId String    @unique
+  invitedBy  String?
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Setting {
+  key   String @id
+  value Json
+}

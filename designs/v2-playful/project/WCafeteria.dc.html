@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cafeteria</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#CC4C5C}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F5F5F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A">
+  <aside style="flex: 1 1 236px; background: #2A2A2A; color: #FFFFFF; display: flex; flex-direction: column; gap: 18px; padding: 22px 14px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #F3879C; color: #2A2A2A; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; transform: rotate(-6deg)">S</div>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">Sirena HR</span>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="WDashboard.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Dashboard</a>
+      <a href="WEmployees.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.8 3.5 5.7"></path></svg>Employees</a>
+      <a href="WAttendance.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Attendance</a>
+      <a href="WCafeteria.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; background: #F3879C; color: #2A2A2A; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 1-3 3.5-3 7h3v11"></path></svg>Cafeteria</a>
+      <a href="WProjects.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"></path></svg>Projects</a>
+      <a href="WLeaveApprovals.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l3 3 5-6"></path></svg><span style="flex: 1">Leave approvals</span><span style="font-size: 11px; font-weight: 800; background: #E75562; color: #2A2A2A; padding: 2px 8px; border-radius: 999px">6</span></a>
+      <a href="WLeaveSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="3"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Leave rules</a>
+      <a href="WHolidays.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Holidays</a>
+      <a href="WPolicies.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Policies</a>
+      <a href="WReports.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 17v-6M11 17V6M16 17v-9"></path></svg>Reports</a>
+      <a href="WAccess.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>Access rules</a>
+      <a href="WSettings.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 14px; text-decoration: none; font-size: 14px; color: #BBBDBF; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>Settings</a>
+    </nav>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.08)">
+      <div style="width: 38px; height: 38px; border-radius: 12px; background: #BBBDBF; color: #2A2A2A; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">MK</div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 800">Meena Krishnan</span><span style="font-size: 11px; color: #BBBDBF">HR Admin · all locations</span></div>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+      <div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 14px; color: #717373; font-weight: 600">Chennai office · Level 3</span>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -0.8px">Cafeteria</h1>
+      </div>
+      <button type="button" style="height: 46px; padding: 0 18px; border-radius: 16px; border: 0; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 800">Download list</button>
+      <button type="button" onClick="{{send}}" style="height: 46px; padding: 0 18px; border-radius: 16px; border: 0; background: #A32330; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 800">{{sendLabel}}</button>
+    </header>
+
+    <div role="tablist" aria-label="Day" style="display: flex; gap: 8px; flex-wrap: wrap">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+        <button type="button" role="tab" aria-selected="{{d.sel}}" onClick="{{d.pick}}" style="{{d.style}}">
+          <span style="font-size: 12px; font-weight: 700">{{d.dow}}</span>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; line-height: 1">{{d.n}}</span>
+          <span style="font-size: 11px; font-weight: 800">{{d.total}} meals</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+      <section style="flex: 2 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px">
+          <div style="position: relative; overflow: hidden; flex: 1 1 200px; background: #F5F5F5; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+            <span style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; color: #2A2A2A"><span style="width: 24px; height: 24px; border: 3px solid #2A2A2A; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background: #FFFFFF"><span style="width: 9px; height: 9px; border-radius: 50%; background: #2A2A2A"></span></span>Veg</span>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 64px; font-weight: 800; line-height: 1; color: #2A2A2A">{{cur.veg}}</span>
+            <span style="font-size: 13px; color: #2A2A2A; font-weight: 600">{{cur.vegMenu}}</span>
+          </div>
+          <div style="position: relative; overflow: hidden; flex: 1 1 200px; background: #FDEDF0; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+            <span style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; color: #A32330"><span style="width: 24px; height: 24px; border: 3px solid #A32330; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background: #FFFFFF"><span style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #A32330"></span></span>Non-veg</span>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 64px; font-weight: 800; line-height: 1; color: #A32330">{{cur.non}}</span>
+            <span style="font-size: 13px; color: #A32330; font-weight: 600">{{cur.nonMenu}}</span>
+          </div>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(42,42,42,0.05)">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">How the day adds up</h2>
+          <div style="display: flex; height: 38px; border-radius: 12px; overflow: hidden; gap: 3px">
+            <div style="{{cur.vegBar}}">{{cur.veg}} veg</div>
+            <div style="{{cur.nonBar}}">{{cur.non}} non-veg</div>
+            <div style="{{cur.skipBar}}">{{cur.skip}}</div>
+          </div>
+          <span style="font-size: 13px; color: #717373">{{cur.note}}</span>
+        </div>
+      </section>
+
+      <aside style="flex: 1 1 300px; min-width: 0; background: #2A2A2A; color: #FFFFFF; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">Booking rules</h2>
+        <div style="display: flex; gap: 10px">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><label for="cut" style="font-size: 12px; font-weight: 800; color: #BBBDBF">Same-day cut-off</label><input id="cut" value="10:30 AM" style="height: 42px; border: 0; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 800; background: rgba(255,255,255,0.08); color: #FFFFFF; min-width: 0"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><label for="win" style="font-size: 12px; font-weight: 800; color: #BBBDBF">Serving</label><input id="win" value="12:30–2:30" style="height: 42px; border: 0; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 800; background: rgba(255,255,255,0.08); color: #FFFFFF; min-width: 0"></div>
+        </div>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 38px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #F3879C; margin: 0">Only on office days (not WFH or leave)</label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 38px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #F3879C; margin: 0">Auto-cancel when leave is approved</label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 38px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #F3879C; margin: 0">Email the count to the vendor at cut-off</label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 38px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #F3879C; margin: 0">Default to each person’s saved preference</label>
+        <div style="display: flex; flex-direction: column; gap: 4px"><label for="vend" style="font-size: 12px; font-weight: 800; color: #BBBDBF">Vendor email</label><input id="vend" value="[vendor@example.com]" style="height: 42px; border: 0; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 14px; background: rgba(255,255,255,0.08); color: #FFFFFF"></div>
+      </aside>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 7, sent: { 5: true, 6: true, 7: true } };
+  }
+  renderVals() {
+    const data = {
+      5: { dow: 'Mon', veg: 17, non: 11, skip: 3, office: 31, vegMenu: 'Sambar rice, poriyal, appalam, curd', nonMenu: 'Fish curry, rice, poriyal, curd' },
+      6: { dow: 'Tue', veg: 15, non: 8, skip: 4, office: 27, vegMenu: 'Chole, jeera rice, phulka, salad', nonMenu: 'Butter chicken, jeera rice, phulka' },
+      7: { dow: 'Wed', veg: 18, non: 9, skip: 0, office: 29, vegMenu: 'Paneer butter masala, jeera rice, dal, gulab jamun', nonMenu: 'Chicken chettinad, jeera rice, dal, gulab jamun' },
+      8: { dow: 'Thu', veg: 12, non: 7, skip: 0, office: 22, vegMenu: 'Veg pulao, raita, aloo gobi', nonMenu: 'Egg curry, pulao, raita' },
+      9: { dow: 'Fri', veg: 14, non: 13, skip: 0, office: 30, vegMenu: 'Veg biryani, raita, mirchi ka salan, payasam', nonMenu: 'Chicken biryani, egg masala, raita, payasam' }
+    };
+    const s = this.state.sel;
+    const c = data[s];
+    const sent = this.state.sent[s];
+    const open = s > 7;
+    const missing = c.office - c.veg - c.non - c.skip;
+    return {
+      days: [5, 6, 7, 8, 9].map((n) => ({
+        n, dow: data[n].dow, total: data[n].veg + data[n].non,
+        sel: n === s ? 'true' : 'false',
+        pick: () => this.setState({ sel: n }),
+        style: 'flex: 1 1 110px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 16px; border-radius: 20px; border: 0; font: inherit; cursor: pointer; ' + (n === s ? 'background: #A32330; color: #FFFFFF;' : 'background: #FFFFFF; color: #2A2A2A;') + (n < 7 ? ' opacity: 0.75;' : '')
+      })),
+      cur: {
+        ...c,
+        vegBar: 'flex: ' + c.veg + '; background: #2A2A2A; color: #FFFFFF; display: flex; align-items: center; padding: 0 12px; font-size: 13px; font-weight: 800; white-space: nowrap;',
+        nonBar: 'flex: ' + c.non + '; background: #CC4C5C; color: #FFFFFF; display: flex; align-items: center; padding: 0 12px; font-size: 13px; font-weight: 800; white-space: nowrap;',
+        skipBar: 'flex: ' + Math.max(c.skip + missing, 1) + '; background: #E7E8E9; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;',
+        skip: (c.skip + missing) + ' none',
+        note: open ? c.office + ' people plan to be in office. Bookings stay open until 10:30 AM that day.' : c.office + ' in office · ' + c.skip + ' skipped · ' + Math.max(missing, 0) + ' didn’t book · auto-cancelled for 1 leave'
+      },
+      sendLabel: sent ? 'Sent to vendor ✓' : (open ? 'Send early count' : 'Send to vendor'),
+      send: () => this.setState({ sent: { ...this.state.sent, [s]: true } })
+    };
+  }
+}
+</script>
+</body>
+</html>

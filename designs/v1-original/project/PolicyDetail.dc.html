@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Policy detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 24px 12px 8px; flex-shrink: 0; border-bottom: 1px solid #E3E6EB">
+    <a href="Policies.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #161A22; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <span style="flex: 1; font-size: 15px; font-weight: 700">Policy</span>
+    <button type="button" aria-label="Download PDF" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #161A22; border-radius: 12px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg></button>
+  </header>
+
+  <article style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 12px; font-weight: 700; color: #0B6B63; letter-spacing: 0.4px">WORK · VERSION 3</span>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 800; line-height: 1.2; letter-spacing: -0.3px">Work From Home Policy</h1>
+      <span style="font-size: 13px; color: #5B6472">Effective 1 Oct 2026 · Owner: HR · 4 min read</span>
+    </div>
+    <div style="background: #E6ECFB; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 13px; font-weight: 800; color: #1E3A8F">What changed from v2</span>
+      <span style="font-size: 13px; color: #1E2A4A; line-height: 1.5">WFH days per week raised from 2 to 3. Core collaboration hours now 11:00 – 16:00 IST.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6; color: #2B3240">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 800; color: #161A22">1. Eligibility</h2>
+      <p style="margin: 0">All confirmed employees may work from home up to three days a week, with their manager's agreement. Employees on probation need HR approval.</p>
+      <h2 style="margin: 0; font-size: 16px; font-weight: 800; color: #161A22">2. Availability</h2>
+      <p style="margin: 0">Be reachable on chat and calls during core hours, and keep your calendar up to date.</p>
+      <h2 style="margin: 0; font-size: 16px; font-weight: 800; color: #161A22">3. Equipment &amp; security</h2>
+      <p style="margin: 0">Use company laptops only, connect over VPN, and never work from public Wi-Fi without it.</p>
+    </div>
+  </article>
+
+  <footer style="flex-shrink: 0; border-top: 1px solid #E3E6EB; padding: 14px 20px 22px; display: flex; flex-direction: column; gap: 12px; background: #FFFFFF">
+    <sc-if value="{{notAcked}}" hint-placeholder-val="{{ true }}">
+      <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #2B3240; line-height: 1.45; min-height: 44px">
+        <input type="checkbox" checked="{{agree}}" onChange="{{toggle}}" style="width: 20px; height: 20px; accent-color: #0B6B63; margin: 1px 0 0; flex-shrink: 0">
+        I have read and understood the Work From Home Policy, version 3.
+      </label>
+      <button type="button" onClick="{{ack}}" disabled="{{disabled}}" style="{{btnStyle}}">Acknowledge</button>
+    </sc-if>
+    <sc-if value="{{acked}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; align-items: center; gap: 12px; background: #E4F3EA; border-radius: 12px; padding: 14px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#146C43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 14px; font-weight: 700; color: #0F5132">Acknowledged</span>
+          <span style="font-size: 12px; color: #0F5132">7 Oct 2026, 10:14 · recorded for HR</span>
+        </div>
+      </div>
+    </sc-if>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { agree: false, acked: false };
+  }
+  renderVals() {
+    const can = this.state.agree;
+    return {
+      agree: this.state.agree,
+      acked: this.state.acked,
+      notAcked: !this.state.acked,
+      disabled: !can,
+      toggle: () => this.setState({ agree: !this.state.agree }),
+      ack: () => { if (can) this.setState({ acked: true }); },
+      btnStyle: 'height: 52px; border-radius: 12px; border: 0; font: inherit; font-size: 16px; font-weight: 700; ' + (can ? 'background: #0B6B63; color: #FFFFFF;' : 'background: #D5D9E0; color: #5B6472;')
+    };
+  }
+}
+</script>
+</body>
+</html>

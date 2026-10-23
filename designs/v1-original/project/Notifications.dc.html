@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6B63}a:hover{color:#08524C}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F4F5F7; font-family: 'Plus Jakarta Sans', sans-serif; color: #161A22; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 24px 12px 8px; flex-shrink: 0">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #161A22; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800; flex: 1">Notifications</h1>
+    <button type="button" onClick="{{readAll}}" style="height: 44px; padding: 0 12px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 700; color: #0B6B63">Mark all read</button>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 4px 20px 16px; overflow: hidden">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+      <h2 style="margin: 8px 0 2px; font-size: 12px; font-weight: 800; color: #5B6472; letter-spacing: 0.5px">{{g.label}}</h2>
+      <sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+        <a href="{{n.href}}" onClick="{{n.read}}" style="{{n.cardStyle}}">
+          <div style="{{n.iconStyle}}">{{n.tag}}</div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+            <span style="font-size: 14px; font-weight: 700; line-height: 1.35">{{n.title}}</span>
+            <span style="font-size: 12px; color: #5B6472">{{n.time}}</span>
+          </div>
+          <span style="{{n.dot}}" aria-label="{{n.unreadLabel}}"></span>
+        </a>
+      </sc-for>
+    </sc-for>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { read: {} };
+  }
+  renderVals() {
+    const kinds = {
+      leave: { bg: '#E3F1EF', fg: '#0B6B63', tag: 'LV' },
+      policy: { bg: '#FDF0E1', fg: '#9A4A06', tag: 'PO' },
+      project: { bg: '#E6ECFB', fg: '#2649B5', tag: 'PJ' },
+      hr: { bg: '#F0E9F8', fg: '#6B3FA0', tag: 'HR' }
+    };
+    const data = [
+      { label: 'TODAY', items: [
+        { id: 1, k: 'leave', title: 'Karthik S requested 1 day casual leave on 9 Oct', time: '10:02', href: 'Approvals.dc.html', unread: true },
+        { id: 2, k: 'policy', title: 'Work From Home Policy v3 published. Please acknowledge.', time: '09:30', href: 'PolicyDetail.dc.html', unread: true },
+        { id: 3, k: 'leave', title: 'Your earned leave (26–28 Oct) was submitted to Arjun Mehta', time: '09:42', href: 'LeaveDetail.dc.html', unread: true }
+      ] },
+      { label: 'EARLIER', items: [
+        { id: 4, k: 'project', title: 'You were added to Internal HR Suite at 40% allocation', time: 'Mon, 5 Oct', href: 'Projects.dc.html', unread: false },
+        { id: 5, k: 'hr', title: 'Your ID proof expires on 30 Nov. Upload a new copy.', time: 'Fri, 2 Oct', href: 'Profile.dc.html', unread: false },
+        { id: 6, k: 'leave', title: 'Monthly leave credit: +1 CL, +1.5 EL', time: 'Thu, 1 Oct', href: 'Leave.dc.html', unread: false }
+      ] }
+    ];
+    const rd = this.state.read;
+    return {
+      readAll: () => {
+        const all = {};
+        data.forEach((g) => g.items.forEach((n) => { all[n.id] = true; }));
+        this.setState({ read: all });
+      },
+      groups: data.map((g) => ({
+        label: g.label,
+        items: g.items.map((n) => {
+          const k = kinds[n.k];
+          const unread = n.unread && !rd[n.id];
+          return {
+            ...n,
+            tag: k.tag,
+            unreadLabel: unread ? 'Unread' : 'Read',
+            read: () => this.setState({ read: { ...rd, [n.id]: true } }),
+            cardStyle: 'display: flex; align-items: flex-start; gap: 12px; border-radius: 14px; padding: 12px 14px; text-decoration: none; color: #161A22; ' + (unread ? 'background: #FFFFFF; border: 1px solid #B9D9D5;' : 'background: #FAFBFC; border: 1px solid #E3E6EB;'),
+            iconStyle: 'width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; background: ' + k.bg + '; color: ' + k.fg + ';',
+            dot: 'width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; background: ' + (unread ? '#0B6B63' : 'transparent') + ';'
+          };
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

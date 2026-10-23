@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A32330}a:hover{color:#2A2A2A}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; color: #2A2A2A">
+  <section aria-label="About Sirena HR" style="flex: 1 1 420px; background: #2A2A2A; color: #FFFFFF; padding: 56px 56px 48px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 48px">
+    <img src="/_blob/a682b71f41d42919c9a22b8b695a142c" alt="Sirena" style="width: 170px; height: auto; display: block">
+    <div style="display: flex; flex-direction: column; gap: 18px; max-width: 460px">
+      <span style="font-size: 13px; font-weight: 800; letter-spacing: 1.5px; color: #EDEDED">SIRENA HR</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 800; line-height: 1.02; letter-spacing: -1.2px">Work stuff,<br>minus the fuss.</h1>
+      <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; color: #EDEDED">
+        <li style="display: flex; gap: 12px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 50%; background: #A32330; flex-shrink: 0"></span>Leave, approvals and holidays in one place</li>
+        <li style="display: flex; gap: 12px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 50%; background: #A32330; flex-shrink: 0"></span>Check in on office Wi-Fi and book lunch</li>
+        <li style="display: flex; gap: 12px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 50%; background: #A32330; flex-shrink: 0"></span>Projects, tasks, files and policies</li>
+      </ul>
+    </div>
+    <span style="font-size: 12px; color: #EDEDED">© 2026 Sirena Technologies · Built in India</span>
+  </section>
+
+  <main style="flex: 1 1 480px; display: flex; align-items: center; justify-content: center; padding: 48px 24px; box-sizing: border-box">
+    <div style="width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 22px">
+      <sc-if value="{{isCreds}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -0.6px">Welcome back</h2>
+          <span style="font-size: 15px">Sign in with your Sirena work account.</span>
+        </div>
+        <form style="display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="em" style="font-size: 13px; font-weight: 800">Work email</label>
+            <input id="em" type="email" value="meena.k@sirena.in" style="height: 50px; border: 1px solid #EDEDED; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #EDEDED; box-sizing: border-box">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline">
+              <label for="pw" style="font-size: 13px; font-weight: 800">Password</label>
+              <a href="#forgot" style="font-size: 13px; font-weight: 800; text-decoration: none">Forgot password?</a>
+            </div>
+            <input id="pw" type="password" value="password12" style="height: 50px; border: 2px solid #2A2A2A; border-radius: 14px; padding: 0 16px; font: inherit; font-size: 15px; background: #FFFFFF; box-sizing: border-box">
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #A32330; margin: 0">Keep me signed in on this computer</label>
+          <button type="button" onClick="{{next}}" style="height: 54px; border-radius: 14px; border: 0; background: #A32330; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer">Sign in</button>
+        </form>
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 13px"><span style="flex: 1; height: 1px; background: #EDEDED"></span>or<span style="flex: 1; height: 1px; background: #EDEDED"></span></div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <button type="button" style="height: 50px; border-radius: 14px; border: 1px solid #EDEDED; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; color: #2A2A2A">Email me a one-time code</button>
+          <button type="button" style="height: 50px; border-radius: 14px; border: 1px solid #EDEDED; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; color: #2A2A2A">Sign in with company SSO</button>
+        </div>
+        <p style="margin: 0; font-size: 14px; text-align: center">New to Sirena? <a href="WSignup.dc.html" style="font-weight: 800; text-decoration: none">Set up your account</a></p>
+      </sc-if>
+
+      <sc-if value="{{isMfa}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -0.6px">Check your phone</h2>
+          <span style="font-size: 15px; line-height: 1.5">HR and admin accounts need a second step. Enter the 6-digit code from your authenticator app.</span>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; gap: 10px">
+          <legend style="position: absolute; left: -9999px">6-digit code</legend>
+          <input aria-label="Digit 1" value="4" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 2px solid #2A2A2A; border-radius: 14px; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+          <input aria-label="Digit 2" value="8" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 2px solid #2A2A2A; border-radius: 14px; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+          <input aria-label="Digit 3" value="2" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 2px solid #2A2A2A; border-radius: 14px; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+          <input aria-label="Digit 4" value="" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 2px solid #A32330; border-radius: 14px; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+          <input aria-label="Digit 5" value="" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 1px solid #EDEDED; border-radius: 14px; background: #EDEDED; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+          <input aria-label="Digit 6" value="" maxlength="1" style="width: 100%; min-width: 0; height: 60px; border: 1px solid #EDEDED; border-radius: 14px; background: #EDEDED; text-align: center; font: inherit; font-size: 24px; font-weight: 800">
+        </fieldset>
+        <a href="WDashboard.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 14px; background: #A32330; color: #FFFFFF; font-size: 16px; font-weight: 800; text-decoration: none">Verify and continue</a>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 40px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #A32330; margin: 0">Trust this computer for 30 days</label>
+        <button type="button" onClick="{{back}}" style="align-self: flex-start; height: 40px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 800; color: #A32330; cursor: pointer">← Use a different account</button>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 'creds' };
+  }
+  renderVals() {
+    const s = this.state.step;
+    return {
+      isCreds: s === 'creds',
+      isMfa: s === 'mfa',
+      next: () => this.setState({ step: 'mfa' }),
+      back: () => this.setState({ step: 'creds' })
+    };
+  }
+}
+</script>
+</body>
+</html>
