@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Injectable, Module, NotFoundException, Param, Post, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, Injectable, Ip, Module, NotFoundException, Param, Post, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -39,23 +39,30 @@ class AcceptInviteDto {
 
 const MAX_FAILS = 5;
 const LOCK_MS = 15 * 60 * 1000;
+// Per source IP, so one address can't try a few passwords on every account.
+const MAX_IP_FAILS = 30;
 
 @Injectable()
 export class AuthService {
   private fails = new Map<string, { count: number; until: number }>();
+  private ipFails = new Map<string, { count: number; since: number }>();
 
   constructor(private prisma: PrismaService, private jwt: JwtService, private audit: AuditService) {}
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, ip = '') {
     const key = email.toLowerCase();
     const f = this.fails.get(key);
     if (f && f.until > Date.now()) throw new UnauthorizedException('Too many attempts. Try again in 15 minutes.');
+    const fi = this.ipFails.get(ip);
+    if (fi && fi.since > Date.now() - LOCK_MS && fi.count >= MAX_IP_FAILS) throw new UnauthorizedException('Too many attempts. Try again in 15 minutes.');
 
     const emp = await this.prisma.employee.findUnique({ where: { email: key } });
     const ok = !!emp?.passwordHash && emp.status !== 'EXITED' && (await bcrypt.compare(password, emp.passwordHash));
     if (!ok || !emp) {
       const count = (f?.count ?? 0) + 1;
       this.fails.set(key, { count, until: count >= MAX_FAILS ? Date.now() + LOCK_MS : 0 });
+      const fresh = !fi || fi.since <= Date.now() - LOCK_MS;
+      this.ipFails.set(ip, { count: fresh ? 1 : fi.count + 1, since: fresh ? Date.now() : fi.since });
       throw new UnauthorizedException('Wrong email or password');
     }
     this.fails.delete(key);
@@ -124,8 +131,8 @@ export class AuthController {
   constructor(private auth: AuthService, private prisma: PrismaService) {}
 
   @Public() @Post('auth/login') @HttpCode(200)
-  login(@Body() dto: LoginDto) {
-    return this.auth.login(dto.email, dto.password);
+  login(@Body() dto: LoginDto, @Ip() ip: string) {
+    return this.auth.login(dto.email, dto.password, ip);
   }
 
   @Post('auth/change-password') @HttpCode(200)

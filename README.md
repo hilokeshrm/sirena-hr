@@ -4,8 +4,9 @@ People, leave, check-in, lunch booking, projects and policies for Sirena Technol
 One Flutter codebase for Android, iOS and the website, plus a NestJS + PostgreSQL API that runs on your own machine. No Docker.
 
 ```
-backend/   NestJS API, Prisma schema, seed data, local Postgres runner
-app/       Flutter app (Android, iOS, web)
+backend/      NestJS API, Prisma schema, seed data, local Postgres runner
+app/          Flutter app (Android, iOS, web)
+ops/windows/  Production server on a Windows machine: setup, deploy, backups, allowlist (see its README)
 ```
 
 ## 1. Run the API on your machine
