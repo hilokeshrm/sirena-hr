@@ -5,6 +5,7 @@ import '../../core/api.dart';
 import '../../core/format.dart';
 import '../../core/theme.dart';
 import '../../widgets/common.dart';
+import 'geo.dart';
 import 'wifi.dart';
 
 class AttendanceScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Map<String, dynamic>? _today;
   List<Map<String, dynamic>> _history = [];
   WifiReading? _wifi;
+  GeoReading? _geo;
   bool _auto = !kIsWeb;
   String _place = 'OFFICE';
   bool _busy = false;
@@ -36,12 +38,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         Api.instance.get('/attendance/today'),
         Api.instance.get('/attendance/me', {'from': ymd(DateTime.now().subtract(const Duration(days: 6))), 'to': todayYmd()}),
         readWifi(),
+        readPosition(),
       ]);
       if (!mounted) return;
       setState(() {
         _today = asMap(r[0]);
         _history = asList(r[1]);
         _wifi = r[2] as WifiReading?;
+        _geo = r[3] as GeoReading?;
         _error = null;
       });
       _tryAutoCheckIn();
@@ -50,10 +54,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
-  bool get _onOffice => onOfficeWifi(_wifi, (_today?['officeNetworks'] as List?) ?? const []);
+  List<dynamic> get _networks => (_today?['officeNetworks'] as List?) ?? const [];
+  bool get _onOfficeWifi => onOfficeWifi(_wifi, _networks);
+  bool get _atOfficeLocation => atOfficeLocation(_geo, _networks);
+  bool get _onOffice => _onOfficeWifi || _atOfficeLocation;
   Map<String, dynamic>? get _rec => (_today?['record'] as Map?)?.cast<String, dynamic>();
 
-  /// Opening the app on office Wi-Fi checks you in by itself.
+  /// Opening the app on office Wi-Fi, or at the office, checks you in by itself.
   Future<void> _tryAutoCheckIn() async {
     if (_autoTried || !_auto || _rec != null || _today?['onLeave'] == true || !_onOffice) return;
     _autoTried = true;
@@ -69,8 +76,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         'auto': auto,
         if (_wifi?.ssid != null) 'ssid': _wifi!.ssid,
         if (_wifi?.bssid != null) 'bssid': _wifi!.bssid,
+        if (_geo != null) ...{'latitude': _geo!.latitude, 'longitude': _geo!.longitude, 'accuracyM': _geo!.accuracyM},
       }),
-      success: auto ? 'Checked in on office Wi-Fi' : 'Checked in',
+      success: !auto ? 'Checked in' : _onOfficeWifi ? 'Checked in on office Wi-Fi' : 'Checked in at the office',
     );
     if (mounted) setState(() => _busy = false);
     await _load();
@@ -97,7 +105,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   if (!kIsWeb)
                     SegmentedButton<bool>(
                       segments: const [
-                        ButtonSegment(value: true, label: Text('Auto (office Wi-Fi)')),
+                        ButtonSegment(value: true, label: Text('Auto (at office)')),
                         ButtonSegment(value: false, label: Text('Manual')),
                       ],
                       selected: {_auto},
@@ -121,7 +129,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       Text(rec == null ? '0h 00m' : durationSince(rec['checkInAt'] as String, rec['checkOutAt'] as String?), style: display(52)),
                       if (rec != null)
                         Text(
-                          '${rec['mode'] == 'WFH' ? 'Working from home' : 'Office'} · ${rec['method'] == 'WIFI' ? 'office Wi-Fi' : 'manual'}${rec['flagged'] == true ? ' · flagged for HR (not on office network)' : ''}',
+                          '${rec['mode'] == 'WFH' ? 'Working from home' : 'Office'} · ${rec['method'] == 'WIFI' ? 'office Wi-Fi' : rec['method'] == 'GPS' ? 'office location' : 'manual'}${rec['flagged'] == true ? ' · flagged for HR (not at the office)' : ''}',
                           textAlign: TextAlign.center,
                         ),
                       gap16,
@@ -141,9 +149,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   gap12,
                   if (_auto && !kIsWeb)
                     Text(
-                      _onOffice
+                      _onOfficeWifi
                           ? "You're on ${_wifi?.ssid ?? 'office Wi-Fi'}. Check-in happens automatically when you open the app."
-                          : "Not on office Wi-Fi${_wifi?.ssid != null ? ' (connected to ${_wifi!.ssid})' : ''}. Switch to Manual to check in from elsewhere.",
+                          : _atOfficeLocation
+                              ? "You're at the office. Check-in happens automatically when you open the app."
+                              : "Not on office Wi-Fi or at the office${_wifi?.ssid != null ? ' (connected to ${_wifi!.ssid})' : ''}. "
+                                  'Turn on location, or switch to Manual to check in from elsewhere.',
                     )
                   else ...[
                     const Text('Working from', style: TextStyle(fontWeight: FontWeight.w700)),

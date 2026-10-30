@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '${rec['mode'] == 'WFH' ? 'Working from home' : 'In office'} since ${clock(rec['checkInAt'] as String)}'
-                        '${rec['method'] == 'WIFI' ? ' · office Wi-Fi' : ''}${rec['checkOutAt'] != null ? ' · checked out ${clock(rec['checkOutAt'] as String)}' : ''}',
+                        '${rec['method'] == 'WIFI' ? ' · office Wi-Fi' : rec['method'] == 'GPS' ? ' · office location' : ''}${rec['checkOutAt'] != null ? ' · checked out ${clock(rec['checkOutAt'] as String)}' : ''}',
                         style: const TextStyle(color: C.grey),
                       ),
                     ],

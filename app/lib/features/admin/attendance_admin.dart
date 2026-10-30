@@ -78,7 +78,7 @@ class _AttendanceAdminState extends State<AttendanceAdmin> {
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text('${(r['employee'] as Map)['fullName']}', style: const TextStyle(fontWeight: FontWeight.w800)),
                         Text(
-                          '${r['mode'] == 'OFFICE' ? 'Office' : 'WFH'} · ${r['method'] == 'WIFI' ? 'Wi-Fi' : 'Manual'}'
+                          '${r['mode'] == 'OFFICE' ? 'Office' : 'WFH'} · ${r['method'] == 'WIFI' ? 'Wi-Fi' : r['method'] == 'GPS' ? 'Location' : 'Manual'}'
                           '${r['ip'] != null ? ' · ${r['ip']}' : ''}',
                           style: const TextStyle(fontSize: 12),
                         ),

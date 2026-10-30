@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'config.dart';
+import 'pinning.dart';
 import 'session.dart';
 
 class ApiError implements Exception {
@@ -20,6 +21,7 @@ class Api {
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 30),
     ));
+    configurePinning(dio);
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
       final token = Session.instance.token;
       if (token != null) options.headers['Authorization'] = 'Bearer $token';

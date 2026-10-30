@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, HttpCode, Injectable, Module, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DayMode, MealChoice } from '@prisma/client';
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsLatitude, IsLongitude, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import type { Request } from 'express';
 import { Actor, AppAbility, assertCan, canDo } from '../access/access.service';
 import { AuditService } from '../common/audit.service';
@@ -15,6 +15,10 @@ class CheckInDto {
   @IsOptional() @IsBoolean() auto?: boolean;
   @IsOptional() @IsString() ssid?: string;
   @IsOptional() @IsString() bssid?: string;
+  /** Device position, when the person allowed location access */
+  @IsOptional() @IsLatitude() latitude?: number;
+  @IsOptional() @IsLongitude() longitude?: number;
+  @IsOptional() @IsNumber() @Min(0) accuracyM?: number;
 }
 
 class CheckOutDto {
@@ -39,13 +43,24 @@ function clientIp(req: Request): string {
   return (req.ip ?? '').replace(/^::ffff:/, '');
 }
 
+/** Metres between two points (haversine). */
+function distanceM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const rad = Math.PI / 180;
+  const a = Math.sin(((lat2 - lat1) * rad) / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(((lon2 - lon1) * rad) / 2) ** 2;
+  return 2 * 6_371_000 * Math.asin(Math.sqrt(a));
+}
+
+// A fix less precise than this can't place someone inside an office reliably.
+const MAX_GPS_ACCURACY_M = 200;
+
 @Injectable()
 export class AttendanceService {
   constructor(private prisma: PrismaService, private audit: AuditService, private cfg: ConfigService) {}
 
   private async myContext(employeeId: string) {
     const me = await this.prisma.employee.findUniqueOrThrow({ where: { id: employeeId }, select: { id: true, locationId: true, workMode: true } });
-    const networks = me.locationId ? await this.prisma.officeNetwork.findMany({ where: { locationId: me.locationId } }) : [];
+    // People without a location (hybrid/remote in the HR sheet) can check in at any office.
+    const networks = await this.prisma.officeNetwork.findMany({ where: me.locationId ? { locationId: me.locationId } : {} });
     return { me, networks };
   }
 
@@ -61,7 +76,7 @@ export class AttendanceService {
     return {
       date: todayIST(),
       record: rec,
-      officeNetworks: networks.map((n) => ({ ssid: n.ssid, bssids: n.bssids })),
+      officeNetworks: networks.map((n) => ({ ssid: n.ssid, bssids: n.bssids, latitude: n.latitude, longitude: n.longitude, radiusM: n.radiusM })),
       onLeave: await this.onLeave(actor.id, todayIST()),
     };
   }
@@ -74,14 +89,18 @@ export class AttendanceService {
     const bssid = dto.bssid?.toLowerCase();
     const byBssid = !!bssid && networks.some((n) => n.bssids.map((b) => b.toLowerCase()).includes(bssid));
     const byIp = networks.some((n) => n.publicIp && n.publicIp === ip);
-    const onOfficeNetwork = byBssid || byIp;
-    if (dto.auto && !onOfficeNetwork) throw new BadRequestException('Automatic check-in only works on office Wi-Fi');
+    const { latitude: lat, longitude: lon, accuracyM } = dto;
+    const hasFix = lat != null && lon != null && (accuracyM ?? 0) <= MAX_GPS_ACCURACY_M;
+    const byGps = hasFix && networks.some((n) => n.latitude != null && n.longitude != null && distanceM(lat, lon, n.latitude, n.longitude) <= n.radiusM);
+    const atOffice = byBssid || byIp || byGps;
+    if (dto.auto && !atOffice) throw new BadRequestException('Automatic check-in only works on office Wi-Fi or at the office');
 
     const data = {
       mode: dto.mode,
-      method: dto.auto && onOfficeNetwork ? ('WIFI' as const) : ('MANUAL' as const),
-      flagged: dto.mode === 'OFFICE' && !onOfficeNetwork,
+      method: dto.auto && (byBssid || byIp) ? ('WIFI' as const) : byGps ? ('GPS' as const) : ('MANUAL' as const),
+      flagged: dto.mode === 'OFFICE' && !atOffice,
       ip, ssid: dto.ssid, bssid,
+      latitude: lat ?? null, longitude: lon ?? null, accuracyM: accuracyM ?? null,
     };
     const existing = await this.prisma.attendance.findUnique({ where: { employeeId_date: { employeeId: actor.id, date: toDbDate(day) } } });
     const rec = existing
