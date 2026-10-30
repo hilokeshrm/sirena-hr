@@ -16,7 +16,8 @@ function Row([string]$Name, [string]$Value, [bool]$Ok = $true) {
 Write-Host "`nSirena HR server  $env:COMPUTERNAME  $(Get-Date -Format 'yyyy-MM-dd HH:mm')" -ForegroundColor Cyan
 
 Write-Host "`nServices"
-foreach ($s in $PgService, $ApiService, $CaddyService, 'sshd', 'Tailscale') {
+$services = @($PgService, $ApiService, $CaddyService, 'sshd') + $(if (Test-UseTailscale) { 'Tailscale' })
+foreach ($s in $services) {
   $svc = Get-Service $s -ErrorAction SilentlyContinue
   $state = if ($svc) { "$($svc.Status)" } else { 'not installed' }
   Row $s $state ($state -eq 'Running')
@@ -25,8 +26,20 @@ foreach ($s in $PgService, $ApiService, $CaddyService, 'sshd', 'Tailscale') {
 Write-Host "`nApp"
 $deployed = if (Test-Path "$SirenaRoot\deployed.txt") { Get-Content "$SirenaRoot\deployed.txt" -Raw } else { 'never' }
 Row 'Deployed' $deployed.Trim()
-try { $h = Invoke-RestMethod 'http://127.0.0.1:3000/api/health' -TimeoutSec 5; Row 'API (local)' "ok $($h.time)" } catch { Row 'API (local)' "$_" $false }
-try { $h = Invoke-RestMethod "https://$($cfg.Domain)/api/health" -TimeoutSec 10; Row 'API (public)' "ok via https://$($cfg.Domain)" } catch { Row 'API (public)' "$_" $false }
+try { $h = Invoke-RestMethod "http://127.0.0.1:$(Get-ApiPort)/api/health" -TimeoutSec 5; Row 'API (local)' "ok $($h.time)" } catch { Row 'API (local)' "$_" $false }
+$publicUrl = Get-PublicUrl
+try {
+  if ($cfg.DirectAccess) {
+    # Many routers don't loop traffic for the public IP back to the LAN, so resolve it to this machine.
+    # This checks Caddy, the certificate and the API; reach-from-outside must be tested from another network.
+    $raw = & curl.exe -k -fsS --max-time 10 --resolve "$($cfg.PublicIp):$($cfg.PublicPort):127.0.0.1" "$publicUrl/api/health" 2>&1
+    if ($LASTEXITCODE -ne 0) { throw ($raw -join "`n") }
+    $h = $raw -join ''
+  } else {
+    $h = Invoke-RestMethod "$publicUrl/api/health" -TimeoutSec 10
+  }
+  Row 'API (public)' "ok via $publicUrl"
+} catch { Row 'API (public)' "$_" $false }
 
 Write-Host "`nDatabase"
 try {
@@ -71,9 +84,14 @@ $freeGb = [math]::Round($disk.Free / 1GB)
 Row 'Disk C:' "$freeGb GB free" ($freeGb -gt 20)
 $boot = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime
 Row 'Up since' $boot.ToString('yyyy-MM-dd HH:mm')
-try { Row 'Tailscale IP' ((& "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4) -join ', ') } catch { Row 'Tailscale IP' 'unknown' $false }
+if (Test-UseTailscale) {
+  try { Row 'Tailscale IP' ((& "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4) -join ', ') } catch { Row 'Tailscale IP' 'unknown' $false }
+}
+Row 'SSH port' "$(Get-SshPort)"
 
-Write-Host "`nAllowlist (Postgres / SSH from the internet; Tailscale always allowed for SSH)"
+$what = if (Test-DbExposed) { 'Postgres and SSH' } else { 'SSH (Postgres is local-only; use the SSH tunnel)' }
+$ts = if (Test-UseTailscale) { '; Tailscale always allowed for SSH' } else { '' }
+Write-Host "`nAllowlist ($what from the internet$ts)"
 $list = @(Get-Allowlist)
 if ($list.Count -eq 0) { Row 'Entries' 'none: nobody can reach Postgres from outside' }
 foreach ($e in $list) { Row $e.label "$($e.ip)  db=$($e.db) ssh=$($e.ssh)  added $($e.added)" }

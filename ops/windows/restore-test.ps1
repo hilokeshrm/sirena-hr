@@ -8,9 +8,11 @@ $cfg = Get-SirenaConfig
 $scratch = 'sirena_restore_test'
 $result = "$BackupsDir\last-restore-test.txt"
 
-$file = Get-ChildItem "$BackupsDir\daily" -Filter '*.dump' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+# Newest nightly or manual backup (pre-deploy/pre-restore copies are safety nets, not the routine backup).
+$file = Get-ChildItem "$BackupsDir\daily", "$BackupsDir\manual" -Filter '*.dump' -ErrorAction SilentlyContinue |
+  Sort-Object LastWriteTime -Descending | Select-Object -First 1
 try {
-  if (-not $file) { throw 'No nightly backup found.' }
+  if (-not $file) { throw 'No nightly or manual backup found.' }
   Invoke-Psql "DROP DATABASE IF EXISTS $scratch WITH (FORCE); CREATE DATABASE $scratch;" | Out-Null
   $env:PGPASSWORD = Get-Secret 'pg-superuser'
   try {

@@ -72,7 +72,7 @@ try {
   if (-not $SkipWeb) {
     Write-Step 'Website'
     Invoke-Native $FlutterBat @('pub', 'get') -WorkDir $app | Out-Null
-    Invoke-Native $FlutterBat @('build', 'web', '--release', "--dart-define=API_BASE=https://$($cfg.Domain)/api") -WorkDir $app | Out-Null
+    Invoke-Native $FlutterBat @('build', 'web', '--release', "--dart-define=API_BASE=$(Get-PublicUrl)/api") -WorkDir $app | Out-Null
     # robocopy exit codes below 8 mean success
     Invoke-Native robocopy.exe @("$app\build\web", $WwwDir, '/MIR', '/NFL', '/NDL', '/NJH', '/NJS', '/NP') -OkCodes 0, 1, 2, 3, 4, 5, 6, 7 | Out-Null
     Write-Ok "Website published to $WwwDir"

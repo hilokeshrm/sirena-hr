@@ -32,6 +32,7 @@ try {
 
   # Retention
   function Prune([string]$Folder, [int]$Keep) {
+    if (-not (Test-Path $Folder)) { return }
     Get-ChildItem $Folder -Filter '*.dump' | Sort-Object LastWriteTime -Descending | Select-Object -Skip $Keep | Remove-Item -Force
   }
   if ($Kind -eq 'daily' -and (Get-Date).DayOfWeek -eq 'Sunday') { Copy-Item $file "$BackupsDir\weekly\" -Force }

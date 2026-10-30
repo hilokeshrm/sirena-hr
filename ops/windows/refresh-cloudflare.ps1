@@ -4,6 +4,8 @@
   Runs Mondays as SYSTEM (scheduled by setup.ps1).
 #>
 . "$PSScriptRoot\lib\common.ps1"
+$cfg = Get-SirenaConfig
+if ($cfg.DirectAccess) { Write-Ok 'Direct-IP mode enabled; Cloudflare ranges are not used'; return }
 $before = if (Test-Path $CloudflareIpsPath) { Get-Content $CloudflareIpsPath -Raw } else { '' }
 Update-CloudflareRanges | Out-Null
 if ((Get-Content $CloudflareIpsPath -Raw) -eq $before) { Write-Ok 'Cloudflare ranges unchanged'; return }

@@ -22,13 +22,23 @@ Assert-Admin
 # ── 1. Folders, config, secrets ─────────────────────────────────────────
 Write-Step 'Folders and config'
 foreach ($d in @($SirenaRoot, $SecretsDir, $LogsDir, $WwwDir, $ToolsBin, "$SirenaRoot\certs", "$SirenaRoot\files",
-    "$BackupsDir\daily", "$BackupsDir\weekly", "$BackupsDir\predeploy", "$BackupsDir\files")) {
+    "$BackupsDir\daily", "$BackupsDir\weekly", "$BackupsDir\predeploy", "$BackupsDir\prerestore", "$BackupsDir\manual", "$BackupsDir\files")) {
   New-Item -ItemType Directory -Force $d | Out-Null
 }
 Protect-Folder $SecretsDir
 Protect-Folder "$SirenaRoot\certs"
 # Lets the ops scripts run by path (e.g. over SSH); downloaded scripts still need a signature.
-Set-ExecutionPolicy RemoteSigned -Scope LocalMachine -Force
+# Group policy may override LocalMachine, so keep the existing effective policy when it
+# already permits this explicitly invoked setup.
+try {
+  Set-ExecutionPolicy RemoteSigned -Scope LocalMachine -Force -ErrorAction Stop
+} catch [System.Security.SecurityException] {
+  $effectivePolicy = Get-ExecutionPolicy
+  if ($effectivePolicy -notin @('Bypass', 'Unrestricted', 'RemoteSigned', 'AllSigned')) {
+    throw "Unable to set LocalMachine execution policy and effective policy is '$effectivePolicy'. Run setup with -ExecutionPolicy Bypass or have an administrator update the policy."
+  }
+  Write-Note "LocalMachine execution policy is managed by policy; continuing with effective policy '$effectivePolicy'."
+}
 
 $localConfig = Join-Path $PSScriptRoot 'config.psd1'
 if (Test-Path $localConfig) {
@@ -95,24 +105,30 @@ Write-Step 'OpenSSH Server'
 $cap = Get-WindowsCapability -Online -Name 'OpenSSH.Server*' | Select-Object -First 1
 if ($cap.State -ne 'Installed') { Add-WindowsCapability -Online -Name $cap.Name | Out-Null }
 Set-Service sshd -StartupType Automatic
-Start-Service sshd
+# sshd may share its new port with Postgres until Postgres moves, so a failed start here is retried after the PostgreSQL step.
+Start-Service sshd -ErrorAction SilentlyContinue
 $sshdConfig = 'C:\ProgramData\ssh\sshd_config'
 $conf = Get-Content $sshdConfig
-$conf = $conf -replace '^#?\s*PasswordAuthentication\s+.*$', 'PasswordAuthentication no' `
+$pwAuth = if (Test-SshPasswordAuth) { 'yes' } else { 'no' }
+$conf = $conf -replace '^#?\s*PasswordAuthentication\s+.*$', "PasswordAuthentication $pwAuth" `
               -replace '^#?\s*PubkeyAuthentication\s+.*$', 'PubkeyAuthentication yes'
-if (-not ($conf -match '^PasswordAuthentication no')) { $conf = @('PasswordAuthentication no') + $conf }
+if (-not ($conf -match "^PasswordAuthentication $pwAuth")) { $conf = @("PasswordAuthentication $pwAuth") + $conf }
+if ((Get-SshPort) -ne 22) { $conf = @("Port $(Get-SshPort)") + @($conf | Where-Object { $_ -notmatch '^#?\s*Port\s+\d+' }) }
 [IO.File]::WriteAllLines($sshdConfig, [string[]]$conf)
 if (-not (Test-Path $AdminKeysPath)) { New-Item -ItemType File $AdminKeysPath | Out-Null }
 Invoke-Native icacls.exe @($AdminKeysPath, '/inheritance:r', '/grant', '*S-1-5-32-544:F', '/grant', '*S-1-5-18:F') | Out-Null
 New-Item -Path 'HKLM:\SOFTWARE\OpenSSH' -Force | Out-Null
 New-ItemProperty -Path 'HKLM:\SOFTWARE\OpenSSH' -Name DefaultShell -PropertyType String -Force `
   -Value "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" | Out-Null
-Restart-Service sshd
-Write-Ok 'sshd running; passwords off. Add keys with add-ssh-key.ps1.'
+Restart-Service sshd -ErrorAction SilentlyContinue
+if ((Get-Service sshd).Status -eq 'Running') { Write-Ok "sshd running; password login $(if (Test-SshPasswordAuth) { 'ON' } else { 'off' }). Add keys with add-ssh-key.ps1." } else { Write-Note "sshd not running yet (port $(Get-SshPort) may be busy); retrying after PostgreSQL." }
 
 # ── 4. Tailscale (backup way in) ────────────────────────────────────────
 Write-Step 'Tailscale'
 $tailscale = "$env:ProgramFiles\Tailscale\tailscale.exe"
+if (-not (Test-UseTailscale)) {
+  Write-Note 'Skipped (UseTailscale = $false in config.psd1).'
+} else {
 $old = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
 & $tailscale status *> $null
 $tsUp = ($LASTEXITCODE -eq 0)
@@ -122,6 +138,7 @@ if (-not $tsUp) {
   & $tailscale up --unattended
 }
 Write-Ok "Tailscale IP: $((& $tailscale ip -4) -join ', ')"
+}
 
 # ── 5. PostgreSQL: settings, TLS, access rules, roles ───────────────────
 Write-Step 'PostgreSQL'
@@ -140,7 +157,14 @@ if (Test-Path "$dbCerts\server.crt") {
   $renew = ($cur.NotAfter -lt (Get-Date).AddDays(30)) -or ($cur.Subject -ne "CN=$($cfg.DbHost)")
 }
 if ($renew) {
-  [IO.File]::WriteAllText("$dbCerts\server.ext", "subjectAltName=DNS:$($cfg.DbHost)`nbasicConstraints=CA:FALSE`nkeyUsage=digitalSignature,keyEncipherment`nextendedKeyUsage=serverAuth`n")
+  $dbSan = $null
+  $parsedDbHost = $null
+  if ([Net.IPAddress]::TryParse($cfg.DbHost, [ref]$parsedDbHost)) {
+    $dbSan = "IP:$($cfg.DbHost)"
+  } else {
+    $dbSan = "DNS:$($cfg.DbHost)"
+  }
+  [IO.File]::WriteAllText("$dbCerts\server.ext", "subjectAltName=$dbSan`nbasicConstraints=CA:FALSE`nkeyUsage=digitalSignature,keyEncipherment`nextendedKeyUsage=serverAuth`n")
   Invoke-Native $openssl @('req', '-new', '-newkey', 'rsa:2048', '-nodes', '-keyout', "$dbCerts\server.key",
     '-out', "$dbCerts\server.csr", '-subj', "/CN=$($cfg.DbHost)") | Out-Null
   Invoke-Native $openssl @('x509', '-req', '-in', "$dbCerts\server.csr", '-CA', "$dbCerts\ca.crt", '-CAkey', "$dbCerts\ca.key",
@@ -160,8 +184,23 @@ Copy-Item "$dbCerts\ca.crt" "$SirenaRoot\sirena-db-ca.crt" -Force
   '# END SIRENA ALLOWLIST'
 ))
 
-Invoke-Psql @"
-ALTER SYSTEM SET listen_addresses = '*';
+# The port may differ from config on a re-run or when PgPort changed, so find the one Postgres is using now.
+# postmaster.pid (line 4) holds the running port; the .conf files may hold a port that only applies after a restart.
+$livePort = $cfg.PgPort
+$pidFile = "$PgDataDir\postmaster.pid"
+$pidLines = if (Test-Path $pidFile) { @(Get-Content $pidFile) } else { @() }
+if ($pidLines.Count -ge 4 -and $pidLines[3] -match '^\d+$') {
+  $livePort = [int]$pidLines[3]
+} else {
+  foreach ($f in "$PgDataDir\postgresql.auto.conf", "$PgDataDir\postgresql.conf") {
+    $m = Select-String -Path $f -Pattern "^\s*port\s*=\s*'?(\d+)" -ErrorAction SilentlyContinue | Select-Object -Last 1
+    if ($m) { $livePort = [int]$m.Matches[0].Groups[1].Value; break }
+  }
+}
+$listen = if (Test-DbExposed) { '*' } else { 'localhost' }
+Invoke-Psql -Port $livePort -Sql @"
+ALTER SYSTEM SET port = $($cfg.PgPort);
+ALTER SYSTEM SET listen_addresses = '$listen';
 ALTER SYSTEM SET ssl = on;
 ALTER SYSTEM SET ssl_min_protocol_version = 'TLSv1.2';
 ALTER SYSTEM SET password_encryption = 'scram-sha-256';
@@ -170,7 +209,21 @@ ALTER SYSTEM SET log_line_prefix = '%m [%p] %q%u@%d %h ';
 ALTER SYSTEM SET logging_collector = on;
 ALTER SYSTEM SET log_rotation_age = '1d';
 "@ | Out-Null
-Restart-Service $PgService
+# SirenaApi depends on Postgres. Stop it first, and kill its process tree if it hangs in "stop pending".
+$apiSvc = Get-Service $ApiService -ErrorAction SilentlyContinue
+if ($apiSvc -and $apiSvc.Status -ne 'Stopped') {
+  & sc.exe stop $ApiService | Out-Null
+  try { $apiSvc.WaitForStatus('Stopped', [TimeSpan]::FromSeconds(20)) } catch {
+    $apiPid = (Get-CimInstance Win32_Service -Filter "Name='$ApiService'").ProcessId
+    if ($apiPid) { & taskkill.exe /PID $apiPid /T /F | Out-Null }
+    Start-Sleep -Seconds 2
+  }
+}
+Restart-Service $PgService -Force
+if ((Get-Service sshd).Status -ne 'Running') {
+  Start-Service sshd
+  Write-Ok "sshd running; password login $(if (Test-SshPasswordAuth) { 'ON' } else { 'off' }). Add keys with add-ssh-key.ps1."
+}
 Start-Sleep -Seconds 3
 Initialize-Database
 Write-Ok "Database $DbName with roles sirena_app (API), sirena_admin (you), sirena_ro (read-only)"
@@ -222,30 +275,43 @@ $envFile = @"
 DATABASE_URL="postgresql://sirena_app:$(Get-Secret 'db-app')@127.0.0.1:$($cfg.PgPort)/$($DbName)"
 JWT_SECRET="$(Get-Secret 'jwt')"
 JWT_EXPIRES_IN="12h"
-PORT=3000
+PORT=$(Get-ApiPort)
 FILES_DIR="C:/sirena/files"
 MEAL_CUTOFF="$($cfg.MealCutoff)"
 TRUST_PROXY=true
-CORS_ORIGINS="https://$($cfg.Domain)"
+CORS_ORIGINS="$(Get-PublicUrl)"
 "@
 [IO.File]::WriteAllText("$RepoDir\backend\.env", $envFile)
 Invoke-Native icacls.exe @("$RepoDir\backend\.env", '/inheritance:r', '/grant:r', '*S-1-5-32-544:F', '*S-1-5-18:F') | Out-Null
 Write-Ok "$RepoDir\backend\.env written"
 
-# ── 10. HTTPS: Cloudflare origin certificate + Caddy ────────────────────
+# ── 10. HTTPS ────────────────────────────────────────────────────────────
 Write-Step 'HTTPS'
 $pem = "$SirenaRoot\certs\origin.pem"; $key = "$SirenaRoot\certs\origin.key"
-foreach ($f in $pem, $key) {
-  if (-not (Test-Path $f) -or -not (Get-Content $f -Raw -ErrorAction SilentlyContinue)) {
-    if (-not (Test-Path $f)) { New-Item -ItemType File $f | Out-Null }
-    Write-Note "Paste the Cloudflare origin $(if ($f -eq $pem) { 'CERTIFICATE' } else { 'PRIVATE KEY' }) into Notepad, save, and close it."
-    Start-Process notepad.exe $f -Wait
+if ($cfg.DirectAccess) {
+  if (-not $cfg.PublicIp -or [int]$cfg.PublicPort -lt 1 -or [int]$cfg.PublicPort -gt 65535) {
+    throw 'DirectAccess requires valid PublicIp and PublicPort in config.psd1.'
   }
+  if (-not (Test-Path $pem) -or -not (Test-Path $key)) {
+    $ext = "$SirenaRoot\certs\direct-ip.ext"
+    [IO.File]::WriteAllText($ext, "subjectAltName=IP:$($cfg.PublicIp)`nbasicConstraints=CA:FALSE`nkeyUsage=digitalSignature,keyEncipherment`nextendedKeyUsage=serverAuth`n")
+    Invoke-Native $openssl @('req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-sha256', '-days', '825',
+      '-keyout', $key, '-out', $pem, '-subj', "/CN=$($cfg.PublicIp)", '-addext', "subjectAltName=IP:$($cfg.PublicIp)") | Out-Null
+    Write-Note "Generated a self-signed certificate for $($cfg.PublicIp). Install $pem on each client to avoid trust warnings."
+  }
+} else {
+  foreach ($f in $pem, $key) {
+    if (-not (Test-Path $f) -or -not (Get-Content $f -Raw -ErrorAction SilentlyContinue)) {
+      if (-not (Test-Path $f)) { New-Item -ItemType File $f | Out-Null }
+      Write-Note "Paste the Cloudflare origin $(if ($f -eq $pem) { 'CERTIFICATE' } else { 'PRIVATE KEY' }) into Notepad, save, and close it."
+      Start-Process notepad.exe $f -Wait
+    }
+  }
+  Update-CloudflareRanges | Out-Null
 }
-Update-CloudflareRanges | Out-Null
 Write-CaddyConfig
 Invoke-Native $caddy @('validate', '--config', "$SirenaRoot\Caddyfile", '--adapter', 'caddyfile') | Out-Null
-Write-Ok "Caddyfile valid; port 443 open to Cloudflare only"
+Write-Ok "Caddyfile valid; HTTPS listening on $(if ($cfg.DirectAccess) { "$($cfg.PublicIp):$($cfg.PublicPort)" } else { '443 for Cloudflare' })"
 
 # ── 11. Services ────────────────────────────────────────────────────────
 Write-Step 'Windows services'
@@ -254,7 +320,8 @@ function Install-NssmService([string]$Name, [string]$Exe, [string]$Arguments, [s
   $settings = @(
     @('Application', $Exe), @('AppParameters', $Arguments), @('AppDirectory', $Dir),
     @('AppStdout', $Log), @('AppStderr', $Log), @('AppRotateFiles', '1'), @('AppRotateOnline', '1'), @('AppRotateBytes', '10485760'),
-    @('Start', 'SERVICE_AUTO_START'), @('AppExit', 'Default', 'Restart'), @('AppRestartDelay', '5000')
+    @('Start', 'SERVICE_AUTO_START'), @('AppExit', 'Default', 'Restart'), @('AppRestartDelay', '5000'),
+    @('AppStopMethodConsole', '2000'), @('AppStopMethodWindow', '2000'), @('AppStopMethodThreads', '2000'), @('AppKillProcessTree', '1')
   )
   if ($DependsOn) { $settings += , @('DependOnService', $DependsOn) }
   foreach ($s in $settings) { Invoke-Native $nssm (@('set', $Name) + $s) | Out-Null }
@@ -321,6 +388,14 @@ Write-Ok "Scheduled: backup daily $($cfg.BackupTime), restore test Sundays, Clou
 # ── Done ────────────────────────────────────────────────────────────────
 Write-Step 'Done'
 & "$PSScriptRoot\status.ps1"
+if (-not (Test-DbExposed)) {
+  Write-Host @"
+
+  Postgres is local-only (port $($cfg.PgPort)). Reach it through an SSH tunnel on port $(Get-SshPort):
+    ssh -p $(Get-SshPort) -L 5433:127.0.0.1:$($cfg.PgPort) <windows user>@$($cfg.PublicIp)   then connect to 127.0.0.1:5433
+"@
+  return
+}
 Write-Host @"
 
   Database connection (pgAdmin / DBeaver / psql):

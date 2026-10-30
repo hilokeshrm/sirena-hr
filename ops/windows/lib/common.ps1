@@ -45,6 +45,27 @@ function Get-SirenaConfig {
   Import-PowerShellDataFile $ConfigPath
 }
 
+# False skips the Tailscale sign-in and drops the Tailscale range from the SSH rule. Defaults to true.
+function Test-UseTailscale { $c = Get-SirenaConfig; if ($null -eq $c.UseTailscale) { $true } else { [bool]$c.UseTailscale } }
+
+# True lets SSH accept Windows account passwords as well as keys. Defaults to false (keys only).
+function Test-SshPasswordAuth { $c = Get-SirenaConfig; if ($null -eq $c.SshPasswordAuth) { $false } else { [bool]$c.SshPasswordAuth } }
+
+# Port sshd listens on. Defaults to 22.
+function Get-SshPort { $c = Get-SirenaConfig; if ($c.SshPort) { [int]$c.SshPort } else { 22 } }
+
+# False keeps Postgres on localhost only: no remote listener, firewall rule or pg_hba entries. Defaults to true.
+function Test-DbExposed { $c = Get-SirenaConfig; if ($null -eq $c.DbExposed) { $true } else { [bool]$c.DbExposed } }
+
+# Local port the API listens on. Defaults to 3000; set ApiPort in config.psd1 if something else uses it.
+function Get-ApiPort { $c = Get-SirenaConfig; if ($c.ApiPort) { [int]$c.ApiPort } else { 3000 } }
+
+# Address browsers and the app use: https://<PublicIp>:<PublicPort> in direct mode, else https://<Domain>.
+function Get-PublicUrl {
+  $c = Get-SirenaConfig
+  if ($c.DirectAccess) { "https://$($c.PublicIp):$($c.PublicPort)" } else { "https://$($c.Domain)" }
+}
+
 function Update-PathFromRegistry {
   $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 }
@@ -110,13 +131,14 @@ function Get-PgBin {
 
 # Runs SQL through psql on this machine. Defaults to the postgres superuser.
 function Invoke-Psql {
-  param([Parameter(Mandatory)][string]$Sql, [string]$Database = 'postgres', [string]$User = 'postgres', [switch]$Scalar, [switch]$Table)
+  param([Parameter(Mandatory)][string]$Sql, [string]$Database = 'postgres', [string]$User = 'postgres', [switch]$Scalar, [switch]$Table, [int]$Port = 0)
   $cfg = Get-SirenaConfig
+  if (-not $Port) { $Port = $cfg.PgPort }
   $tmp = [IO.Path]::GetTempFileName()
   [IO.File]::WriteAllText($tmp, $Sql, (New-Object Text.UTF8Encoding $false))
   $env:PGPASSWORD = Get-Secret $RoleSecrets[$User]
   try {
-    $a = @('-h', '127.0.0.1', '-p', "$($cfg.PgPort)", '-U', $User, '-d', $Database, '-v', 'ON_ERROR_STOP=1', '-X', '-f', $tmp)
+    $a = @('-h', '127.0.0.1', '-p', "$Port", '-U', $User, '-d', $Database, '-v', 'ON_ERROR_STOP=1', '-X', '-f', $tmp)
     if ($Scalar) { $a += @('-t', '-A') } elseif (-not $Table) { $a += '-q' }
     Invoke-Native (Join-Path (Get-PgBin) 'psql.exe') $a
   } finally {
@@ -205,13 +227,15 @@ function Disable-OtherInboundRules([int]$Port) {
 function Sync-Allowlist {
   $cfg = Get-SirenaConfig
   $list = Get-Allowlist
-  $dbIps = @($list | Where-Object { $_.db } | ForEach-Object { $_.ip })
-  $sshIps = @($list | Where-Object { $_.ssh } | ForEach-Object { $_.ip }) + $TailscaleRange
+  $dbIps = if (Test-DbExposed) { @($list | Where-Object { $_.db } | ForEach-Object { $_.ip }) } else { @() }
+  $sshIps = @($list | Where-Object { $_.ssh } | ForEach-Object { $_.ip }) + $(if (Test-UseTailscale) { $TailscaleRange })
 
   Set-InboundRule 'Sirena-Postgres' $cfg.PgPort $dbIps
-  Set-InboundRule 'Sirena-SSH' 22 $sshIps
-  Disable-OtherInboundRules $cfg.PgPort
-  Disable-OtherInboundRules 22
+  $sshPort = Get-SshPort
+  Set-InboundRule 'Sirena-SSH' $sshPort $sshIps
+  if (Test-DbExposed) { Disable-OtherInboundRules $cfg.PgPort }
+  Disable-OtherInboundRules $sshPort
+  if ($sshPort -ne 22) { Disable-OtherInboundRules 22 }
 
   # Remote logins: only the admin and read-only roles, only to sirena_hr, only over SSL, only from listed IPs.
   $hba = Join-Path $PgDataDir 'pg_hba.conf'
@@ -219,7 +243,7 @@ function Sync-Allowlist {
   $start = [array]::IndexOf($lines, '# BEGIN SIRENA ALLOWLIST')
   $end = [array]::IndexOf($lines, '# END SIRENA ALLOWLIST')
   if ($start -lt 0 -or $end -lt $start) { throw "Allowlist markers missing from $hba. Re-run setup.ps1." }
-  $block = @($list | Where-Object { $_.db } | ForEach-Object { "hostssl  $DbName  sirena_admin,sirena_ro  $($_.ip)  scram-sha-256  # $($_.label)" })
+  $block = if (-not (Test-DbExposed)) { @() } else { @($list | Where-Object { $_.db } | ForEach-Object { "hostssl  $DbName  sirena_admin,sirena_ro  $($_.ip)  scram-sha-256  # $($_.label)" }) }
   $new = @($lines[0..$start]) + $block + @($lines[$end..($lines.Count - 1)])
   [IO.File]::WriteAllLines($hba, [string[]]$new)
   Invoke-Psql 'SELECT pg_reload_conf();' | Out-Null
@@ -239,9 +263,20 @@ function Update-CloudflareRanges {
 # Port 443 accepts only Cloudflare, so nobody can skip Cloudflare by hitting the IP directly.
 function Write-CaddyConfig {
   $cfg = Get-SirenaConfig
-  $cf = @(Get-Content $CloudflareIpsPath | Where-Object { $_.Trim() })
   $root = $SirenaRoot -replace '\\', '/'
-  $caddyfile = @"
+  if ($cfg.DirectAccess) {
+    if (-not $cfg.PublicIp) { throw 'DirectAccess requires PublicIp in config.psd1.' }
+    $site = "https://$($cfg.PublicIp):$($cfg.PublicPort)"
+    $tls = "tls $root/certs/origin.pem $root/certs/origin.key"
+  } else {
+    $cf = @(Get-Content $CloudflareIpsPath | Where-Object { $_.Trim() })
+    $site = $cfg.Domain
+    $tls = "tls $root/certs/origin.pem $root/certs/origin.key"
+  }
+  $global = if ($cfg.DirectAccess) {
+    "{`n`tauto_https disable_redirects`n`t# Clients that connect by IP send no SNI; serve the IP certificate to them.`n`tdefault_sni $($cfg.PublicIp)`n}"
+  } else {
+    @"
 {
 	auto_https disable_redirects
 	servers {
@@ -249,9 +284,13 @@ function Write-CaddyConfig {
 		client_ip_headers CF-Connecting-IP
 	}
 }
+"@
+  }
+  $caddyfile = @"
+$global
 
-$($cfg.Domain) {
-	tls $root/certs/origin.pem $root/certs/origin.key
+$site {
+	$tls
 	encode zstd gzip
 
 	header {
@@ -262,7 +301,7 @@ $($cfg.Domain) {
 	}
 
 	handle /api/* {
-		reverse_proxy 127.0.0.1:3000 {
+		reverse_proxy 127.0.0.1:$(Get-ApiPort) {
 			# The API trusts X-Forwarded-For from loopback; give it the real visitor IP.
 			header_up X-Forwarded-For {client_ip}
 		}
@@ -283,8 +322,13 @@ $($cfg.Domain) {
 }
 "@
   [IO.File]::WriteAllText((Join-Path $SirenaRoot 'Caddyfile'), $caddyfile)
-  Set-InboundRule 'Sirena-HTTPS' 443 $cf
-  Disable-OtherInboundRules 443
+  if ($cfg.DirectAccess) {
+    Set-InboundRule 'Sirena-HTTPS' $cfg.PublicPort 'Any'
+    Disable-OtherInboundRules $cfg.PublicPort
+  } else {
+    Set-InboundRule 'Sirena-HTTPS' 443 $cf
+    Disable-OtherInboundRules 443
+  }
 }
 
 # ── Services ────────────────────────────────────────────────────────────
@@ -293,7 +337,7 @@ function Test-ApiHealth([int]$TimeoutSeconds = 45) {
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {
     try {
-      $r = Invoke-RestMethod 'http://127.0.0.1:3000/api/health' -TimeoutSec 5
+      $r = Invoke-RestMethod "http://127.0.0.1:$(Get-ApiPort)/api/health" -TimeoutSec 5
       if ($r.ok) { return $true }
     } catch { }
     Start-Sleep -Seconds 2

@@ -18,6 +18,40 @@ You / Claude ─SSH key, allowlisted IPs or Tailscale─► :22    Remote Deskto
 
 Everything else is closed.
 
+### Direct public-IP mode (no domain, no Cloudflare)
+
+Use this when the server has a public IP but no domain on Cloudflare, or only a couple of router ports. This is how the RTX server runs:
+
+```powershell
+Domain          = '106.51.67.75'
+DirectAccess    = $true
+PublicIp        = '106.51.67.75'
+PublicPort      = 8888      # website + API, open to everyone
+SshPort         = 7777      # SSH, allowlisted IPs only
+DbExposed       = $false    # Postgres listens on localhost only; reach it through the SSH tunnel
+PgPort          = 5433
+ApiPort         = 3100      # local API port (3000 was taken by another app)
+UseTailscale    = $false
+SshPasswordAuth = $false    # keys only
+```
+
+What's different from the default:
+- **Certificate:** setup creates a self-signed certificate for the IP. Browsers show a warning, and the Android app won't trust it.
+- **Firewall:** opens only `PublicPort` (to everyone) and `SshPort` (allowlist only).
+- **Router:** forward only those two ports.
+- **Cloudflare:** the weekly Cloudflare job does nothing in this mode.
+- **Database tools:** connect through SSH. On your laptop, `~/.ssh/config`:
+  ```
+  Host sirena
+      HostName 106.51.67.75
+      Port 7777
+      User "<Windows user on the server>"
+      IdentityFile ~/.ssh/sirena_server
+      LocalForward 15432 127.0.0.1:5433
+  ```
+  Keep `ssh sirena` open, then point pgAdmin at `localhost:15432`.
+- **IP changes lock you out:** when your laptop's IP changes, someone at the server must run `allow-ip.ps1` for the new IP. Without Tailscale there's no other way in.
+
 ---
 
 ## Part 1: Before you go to the server (on your laptop, about 20 minutes)
