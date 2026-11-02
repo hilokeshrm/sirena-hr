@@ -28,7 +28,7 @@ Write-Step 'Safety backup of the current data'
 & "$PSScriptRoot\backup.ps1" -Kind prerestore
 
 Write-Step 'Restoring'
-Stop-Service $ApiService -ErrorAction SilentlyContinue
+Stop-ApiService
 try {
   Invoke-Psql "DROP DATABASE IF EXISTS $DbName WITH (FORCE);" | Out-Null
   Initialize-Database

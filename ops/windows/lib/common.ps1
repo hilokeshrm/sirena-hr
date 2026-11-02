@@ -333,6 +333,27 @@ $site {
 
 # ── Services ────────────────────────────────────────────────────────────
 
+# Stop-Service can sit in StopPending forever when the service wrapper hangs.
+# Ask politely, then end the wrapper and its node process.
+function Stop-ApiService([int]$TimeoutSeconds = 30) {
+  $svc = Get-Service $ApiService -ErrorAction SilentlyContinue
+  if (-not $svc -or $svc.Status -eq 'Stopped') { return }
+  Stop-Service $ApiService -NoWait -ErrorAction SilentlyContinue
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  while ((Get-Date) -lt $deadline) {
+    if ((Get-Service $ApiService).Status -eq 'Stopped') { return }
+    Start-Sleep -Seconds 1
+  }
+  $wrapperPid = (Get-CimInstance Win32_Service -Filter "Name='$ApiService'").ProcessId
+  if ($wrapperPid) {
+    Write-Note "API service did not stop in $TimeoutSeconds s; ending it"
+    Get-CimInstance Win32_Process -Filter "ParentProcessId=$wrapperPid" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    Stop-Process -Id $wrapperPid -Force -ErrorAction SilentlyContinue
+  }
+  $deadline = (Get-Date).AddSeconds(15)
+  while ((Get-Service $ApiService).Status -ne 'Stopped' -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
+}
+
 function Test-ApiHealth([int]$TimeoutSeconds = 45) {
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {

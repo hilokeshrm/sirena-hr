@@ -46,7 +46,7 @@ try {
   }
 
   Write-Step 'API'
-  Stop-Service $ApiService -ErrorAction SilentlyContinue
+  Stop-ApiService
   try {
     Build-Api
     Invoke-Native npx.cmd @('prisma', 'migrate', 'deploy') -WorkDir $backend | Select-Object -Last 3 | ForEach-Object { Write-Ok $_ }
@@ -59,7 +59,7 @@ try {
     if ($new -ne $prev) {
       Write-Note "Deploy failed: $err"
       Write-Note "Rolling back code to $($prev.Substring(0, 7))"
-      Stop-Service $ApiService -ErrorAction SilentlyContinue
+      Stop-ApiService
       Invoke-Native git.exe @('-C', $RepoDir, 'reset', '--hard', $prev) | Out-Null
       Build-Api
       Start-Service $ApiService
