@@ -11,7 +11,7 @@ import type { Response } from 'express';
 import { createReadStream, mkdirSync, writeFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
-import { AccessService, Actor, AppAbility, assertCan, canDo } from '../access/access.service';
+import { AccessService, Actor, AppAbility, assertCan, canDo, hasPermission } from '../access/access.service';
 import { AuditService, NotifyService } from '../common/audit.service';
 import { fromDbDate, sentKeys, toDbDate } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
@@ -63,7 +63,7 @@ export class ProjectsService {
   }
 
   private canSeeAll(actor: Actor) {
-    return actor.role === 'SUPER_ADMIN' || actor.role === 'HR_ADMIN';
+    return hasPermission(actor, 'projects.manageAll');
   }
 
   async list(actor: Actor) {

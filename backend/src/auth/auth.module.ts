@@ -178,6 +178,7 @@ export class AuthController {
         viewMealReport: canDo(ability, 'read', 'MealReport'),
         viewAllAttendance: canDo(ability, 'read', 'Attendance', { employeeId: '_', employeeLocationId: actor.locationId }),
         admin: actor.role === 'SUPER_ADMIN',
+        manageAccess: actor.role === 'SUPER_ADMIN',
       },
       projects: actor.projects,
     };

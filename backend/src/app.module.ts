@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AccessAdminModule } from './access/access-admin.module';
 import { AccessModule } from './access/access.service';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
@@ -17,6 +18,7 @@ import { ProjectsModule } from './projects/projects.module';
     PrismaModule,
     CommonModule,
     AccessModule,
+    AccessAdminModule,
     AuthModule,
     EmployeesModule,
     LeaveModule,

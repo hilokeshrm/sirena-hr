@@ -115,3 +115,4 @@ Set the real office SSID / BSSIDs / public IP in the `OfficeNetwork` table (the 
 - **Projects** — members and roles, milestones, tasks, folders with restricted folders for leads, versioned file uploads, one-minute download links.
 - **Policies** — versions, publish with notification, acknowledgement tracking and reminders.
 - **Access (ABAC)** — rules use role, location, reporting line and project membership (`backend/src/access/access.service.ts`).
+  Which role holds which permission is stored in the database; a super admin switches them per role (or per person) under *Roles & access*. The permission list is in `backend/src/access/permissions.ts`.

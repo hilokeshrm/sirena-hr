@@ -127,9 +127,18 @@ export class EmployeesService {
     }
     if (dto.role && !['HR_ADMIN', 'SUPER_ADMIN'].includes(actor.role)) throw new BadRequestException('Only HR Admin can change roles');
     if (dto.managerId === id) throw new BadRequestException('Someone cannot report to themselves');
+    if ((dto.role && dto.role !== 'SUPER_ADMIN') || dto.status === 'EXITED') await this.keepOneSuperAdmin(id);
     const updated = await this.prisma.employee.update({ where: { id }, data: this.toData(dto) as Prisma.EmployeeUncheckedUpdateInput, select: RESTRICTED_SELECT });
     await this.audit.log(actor.id, 'update', 'Employee', id, { fields: sentKeys(dto) });
     return updated;
+  }
+
+  /** Refuses to demote or exit the last active super admin, so nobody is locked out of access control. */
+  private async keepOneSuperAdmin(id: string) {
+    const target = await this.prisma.employee.findUniqueOrThrow({ where: { id }, select: { role: true, status: true } });
+    if (target.role !== 'SUPER_ADMIN' || target.status === 'EXITED') return;
+    const others = await this.prisma.employee.count({ where: { role: 'SUPER_ADMIN', status: { not: 'EXITED' }, id: { not: id } } });
+    if (!others) throw new BadRequestException('This is the last super admin. Make someone else super admin first.');
   }
 
   async lookups() {

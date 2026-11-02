@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/session.dart';
 import 'core/theme.dart';
+import 'features/admin/access_admin.dart';
 import 'features/admin/attendance_admin.dart';
 import 'features/admin/cafeteria_admin.dart';
 import 'features/admin/employees_admin.dart';
@@ -69,6 +70,7 @@ final appRouter = GoRouter(
         _page('/admin/attendance', (_) => const AttendanceAdmin()),
         _page('/admin/cafeteria', (_) => const CafeteriaAdmin()),
         _page('/admin/policies', (_) => const PoliciesAdmin()),
+        _page('/admin/access', (_) => const AccessAdmin()),
       ],
     ),
   ],

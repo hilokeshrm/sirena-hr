@@ -2,6 +2,7 @@ import { AbilityBuilder, createMongoAbility, MongoAbility, MongoQuery, subject a
 import { ForbiddenException, Global, Injectable, Module, UnauthorizedException } from '@nestjs/common';
 import { ProjectRole, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { isPermissionKey, LOCATION_SCOPED_ROLES, PERMISSION_KEYS, PermissionKey } from './permissions';
 
 /** Everything the access rules know about the signed-in person. */
 export interface Actor {
@@ -12,6 +13,8 @@ export interface Actor {
   /** Everyone below this person in the reporting tree. */
   managerOf: string[];
   projects: { projectId: string; role: ProjectRole }[];
+  /** Permissions held through the person's role and personal overrides. */
+  permissions: PermissionKey[];
 }
 
 export type Action =
@@ -24,17 +27,18 @@ export type SubjectName =
 
 export type AppAbility = MongoAbility<[Action, SubjectName | Record<string, unknown>]>;
 
-const HR_ROLES: Role[] = ['HR', 'HR_ADMIN'];
-
 /**
  * Attribute-based access rules. Each rule reads attributes of the person
- * (role, location, reports, projects) and of the record (owner, status, project, sensitivity).
- * Anything not allowed here is denied.
+ * (role, location, reports, projects, granted permissions) and of the record
+ * (owner, status, project, sensitivity). Anything not allowed here is denied.
+ * Which permissions a role holds is data (RolePermission / PermissionOverride);
+ * what each permission allows, and how far it reaches, is defined here.
  */
 export function defineAbilityFor(a: Actor): AppAbility {
   const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
   const projectIds = a.projects.map((p) => p.projectId);
   const leadProjectIds = a.projects.filter((p) => p.role !== 'MEMBER').map((p) => p.projectId);
+  const has = (k: PermissionKey) => a.permissions.includes(k);
 
   // ── Everyone ──
   can('read', 'Employee'); // directory fields only; services strip restricted fields
@@ -59,19 +63,24 @@ export function defineAbilityFor(a: Actor): AppAbility {
   can(['read', 'upload'], 'Folder', { projectId: { $in: leadProjectIds } });
   can('update', 'Project', { id: { $in: leadProjectIds } });
 
-  // ── HR: scoped to their own location; HR Admin: all locations ──
-  if (HR_ROLES.includes(a.role)) {
-    const scope = (a.role === 'HR_ADMIN' ? {} : { locationId: a.locationId }) as MongoQuery;
-    can(['create', 'update', 'readSensitive'], 'Employee', scope);
-    can('read', ['LeaveRequest', 'Attendance'], a.role === 'HR_ADMIN' ? {} : { employeeLocationId: a.locationId });
-    can('approve', 'LeaveRequest', { status: 'PENDING_HR', ...(a.role === 'HR_ADMIN' ? {} : { employeeLocationId: a.locationId }) });
-    can('manage', ['LeaveType', 'Holiday', 'Policy', 'PolicyVersion', 'Invite']);
-    can('read', 'MealReport');
-  }
-  if (a.role === 'FINANCE') {
-    can('readSensitive', 'Employee');
-    can('read', 'MealReport');
-  }
+  // ── Granted permissions. HR (and employees given one) reach their own location only. ──
+  const local = LOCATION_SCOPED_ROLES.includes(a.role);
+  const scope = (local ? { locationId: a.locationId } : {}) as MongoQuery;
+  const employeeScope = (local ? { employeeLocationId: a.locationId } : {}) as MongoQuery;
+  if (has('employees.viewSensitive')) can('readSensitive', 'Employee', scope);
+  if (has('employees.manage')) can(['create', 'update'], 'Employee', scope);
+  if (has('invites.send')) can('manage', 'Invite');
+  if (has('leave.viewAll')) can('read', ['LeaveRequest', 'Attendance'], employeeScope);
+  if (has('leave.approve')) can('approve', 'LeaveRequest', { status: 'PENDING_HR', ...employeeScope });
+  if (has('leave.manageTypes')) can('manage', 'LeaveType');
+  if (has('holidays.manage')) can('manage', 'Holiday');
+  if (has('offices.manage')) can('manage', 'OfficeNetwork');
+  if (has('policies.manage')) can('manage', ['Policy', 'PolicyVersion']);
+  if (has('meals.viewReport')) can('read', 'MealReport');
+  if (has('projects.manageAll')) can('manage', ['Project', 'Task', 'Folder']);
+  if (has('audit.view')) can('read', 'AuditLog');
+
+  // Super admins always keep full access, whatever the permission table says.
   if (a.role === 'SUPER_ADMIN') can('manage', 'all');
 
   // Nobody approves their own leave — this overrides every rule above.
@@ -80,9 +89,62 @@ export function defineAbilityFor(a: Actor): AppAbility {
   return build();
 }
 
+/** Role grants plus one person's overrides → the permissions that person holds. */
+export function effectivePermissions(role: Role, roleGrants: Iterable<PermissionKey>, overrides: Iterable<[PermissionKey, boolean]> = []): PermissionKey[] {
+  if (role === 'SUPER_ADMIN') return [...PERMISSION_KEYS];
+  const held = new Set(roleGrants);
+  for (const [k, granted] of overrides) {
+    if (granted) held.add(k);
+    else held.delete(k);
+  }
+  return PERMISSION_KEYS.filter((k) => held.has(k));
+}
+
+/** True for super admins and anyone holding the permission. */
+export function hasPermission(a: Actor, k: PermissionKey) {
+  return a.role === 'SUPER_ADMIN' || a.permissions.includes(k);
+}
+
+interface Grants {
+  roles: Map<Role, Set<PermissionKey>>;
+  overrides: Map<string, [PermissionKey, boolean][]>;
+}
+
+// Grants change rarely; reload at least this often in case another process changed them.
+const GRANTS_TTL_MS = 60_000;
+
 @Injectable()
 export class AccessService {
+  private grants: { at: number; value: Promise<Grants> } | null = null;
+
   constructor(private prisma: PrismaService) {}
+
+  /** Who holds which permission, cached; call `invalidate()` after changing it. */
+  loadGrants(): Promise<Grants> {
+    if (this.grants && Date.now() - this.grants.at < GRANTS_TTL_MS) return this.grants.value;
+    const value = (async () => {
+      const [roleRows, overrideRows] = await Promise.all([this.prisma.rolePermission.findMany(), this.prisma.permissionOverride.findMany()]);
+      const roles = new Map<Role, Set<PermissionKey>>();
+      for (const r of roleRows) if (isPermissionKey(r.permission)) roles.set(r.role, (roles.get(r.role) ?? new Set()).add(r.permission));
+      const overrides = new Map<string, [PermissionKey, boolean][]>();
+      for (const o of overrideRows) {
+        if (isPermissionKey(o.permission)) overrides.set(o.employeeId, [...(overrides.get(o.employeeId) ?? []), [o.permission, o.granted]]);
+      }
+      return { roles, overrides };
+    })();
+    this.grants = { at: Date.now(), value };
+    value.catch(() => (this.grants = null));
+    return value;
+  }
+
+  invalidate() {
+    this.grants = null;
+  }
+
+  async permissionsOf(employeeId: string, role: Role) {
+    const g = await this.loadGrants();
+    return effectivePermissions(role, g.roles.get(role) ?? [], g.overrides.get(employeeId) ?? []);
+  }
 
   async loadActor(employeeId: string): Promise<Actor> {
     const me = await this.prisma.employee.findUnique({
@@ -104,7 +166,8 @@ export class AccessService {
       queue.push(...(children.get(id) ?? []));
     }
 
-    return { id: me.id, role: me.role, locationId: me.locationId, departmentId: me.departmentId, managerOf, projects: me.memberships };
+    const permissions = await this.permissionsOf(me.id, me.role);
+    return { id: me.id, role: me.role, locationId: me.locationId, departmentId: me.departmentId, managerOf, projects: me.memberships, permissions };
   }
 
   ability(actor: Actor) {
