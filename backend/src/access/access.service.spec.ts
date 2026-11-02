@@ -2,8 +2,8 @@ import { AbilityBuilder, createMongoAbility, MongoQuery } from '@casl/ability';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { Role } from '@prisma/client';
-import { AccessService, Action, Actor, AppAbility, canDo, defineAbilityFor, effectivePermissions, hasPermission, SubjectName } from './access.service';
-import { defaultPermissionsFor, PermissionKey } from './permissions';
+import { AccessService, Action, Actor, AppAbility, canDo, defineAbilityFor, effectivePermissions, hasPermission, roleChangeError, SubjectName } from './access.service';
+import { defaultPermissionsFor, describeEffect, PermissionKey } from './permissions';
 
 /** The hard-coded rules as they were before permissions moved into the database. */
 function legacyAbilityFor(a: Actor): AppAbility {
@@ -154,7 +154,7 @@ describe('AccessService grants cache', () => {
       rolePermission: { findMany: jest.fn(() => Promise.resolve(rows)) },
       permissionOverride: { findMany: jest.fn(() => Promise.resolve([{ employeeId: 'e1', permission: 'audit.view', granted: true }])) },
     };
-    return { svc: new AccessService(prisma as never), prisma };
+    return { svc: new AccessService(prisma as never, { log: jest.fn() } as never), prisma };
   }
 
   it('reads grants once until invalidated, ignoring unknown keys', async () => {
@@ -167,5 +167,31 @@ describe('AccessService grants cache', () => {
     svc.invalidate();
     expect(await svc.permissionsOf('e2', 'FINANCE')).toEqual([]);
     expect(prisma.rolePermission.findMany).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('roleChangeError', () => {
+  const superAdmin = { id: 'boss', role: 'SUPER_ADMIN' as Role };
+
+  it('lets only a super admin change roles', () => {
+    expect(roleChangeError(superAdmin, { id: 'x', role: 'EMPLOYEE' }, 'HR', 1)).toBeNull();
+    expect(roleChangeError({ id: 'hra', role: 'HR_ADMIN' }, { id: 'x', role: 'EMPLOYEE' }, 'SUPER_ADMIN', 1)).toMatch(/Only a super admin/);
+    expect(roleChangeError({ id: 'hra', role: 'HR_ADMIN' }, { id: 'x', role: 'EMPLOYEE' }, 'HR', 1)).toMatch(/Only a super admin/);
+    // Saving a form with the role unchanged is fine for anyone.
+    expect(roleChangeError({ id: 'hra', role: 'HR_ADMIN' }, { id: 'x', role: 'HR' }, 'HR', 1)).toBeNull();
+  });
+
+  it('blocks changing your own role and demoting the last super admin', () => {
+    expect(roleChangeError(superAdmin, { id: 'boss', role: 'SUPER_ADMIN' }, 'EMPLOYEE', 3)).toMatch(/your own role/);
+    expect(roleChangeError(superAdmin, { id: 'other', role: 'SUPER_ADMIN' }, 'HR', 0)).toMatch(/last super admin/);
+    expect(roleChangeError(superAdmin, { id: 'other', role: 'SUPER_ADMIN' }, 'HR', 1)).toBeNull();
+  });
+});
+
+describe('describeEffect', () => {
+  it('explains the scope for the role', () => {
+    expect(describeEffect('leave.viewAll', 'EMPLOYEE', false)).toMatch(/their own leave/);
+    expect(describeEffect('leave.viewAll', 'HR', true)).toMatch(/at their location/);
+    expect(describeEffect('leave.viewAll', 'HR_ADMIN', true)).toBe('Sees everyone’s leave and attendance.');
   });
 });

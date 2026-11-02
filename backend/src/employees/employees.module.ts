@@ -1,8 +1,8 @@
-import { BadRequestException, Body, Controller, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { EmployeeStatus, EmploymentType, FoodPref, Prisma, Role, WorkMode } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { Actor, AppAbility, assertCan, canDo } from '../access/access.service';
+import { AccessService, Actor, AppAbility, assertCan, canDo } from '../access/access.service';
 import { AuditService } from '../common/audit.service';
 import { fromDbDate, sentKeys, toDbDate, todayIST } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
@@ -56,7 +56,7 @@ const RESTRICTED_SELECT = {
 
 @Injectable()
 export class EmployeesService {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private access: AccessService) {}
 
   /** Directory with where everyone is today. */
   async list(q?: string, departmentId?: string, includeExited = false) {
@@ -101,9 +101,7 @@ export class EmployeesService {
   async create(actor: Actor, ability: AppAbility, dto: EmployeeDto) {
     if (!dto.fullName || !dto.email) throw new BadRequestException('fullName and email are required');
     assertCan(ability, 'create', 'Employee', { locationId: dto.locationId ?? null });
-    if (dto.role && dto.role !== 'EMPLOYEE' && !['HR_ADMIN', 'SUPER_ADMIN'].includes(actor.role)) {
-      throw new BadRequestException('Only HR Admin can assign roles');
-    }
+    if (dto.role && dto.role !== 'EMPLOYEE' && actor.role !== 'SUPER_ADMIN') throw new ForbiddenException('Only a super admin can assign roles');
     const last = await this.prisma.employee.findFirst({ where: { code: { startsWith: 'SIR-' } }, orderBy: { code: 'desc' }, select: { code: true } });
     const next = (last ? Number(last.code.slice(4)) : 0) + 1;
     const code = `SIR-${String(next).padStart(4, '0')}`;
@@ -125,11 +123,12 @@ export class EmployeesService {
       const blocked = sentKeys(dto).filter((k) => !SELF_EDITABLE.includes(k as keyof EmployeeDto));
       if (blocked.length) throw new BadRequestException(`You can't change: ${blocked.join(', ')}. Ask HR.`);
     }
-    if (dto.role && !['HR_ADMIN', 'SUPER_ADMIN'].includes(actor.role)) throw new BadRequestException('Only HR Admin can change roles');
+    const before = dto.role ? await this.access.assertRoleChange(actor, id, dto.role) : null;
     if (dto.managerId === id) throw new BadRequestException('Someone cannot report to themselves');
-    if ((dto.role && dto.role !== 'SUPER_ADMIN') || dto.status === 'EXITED') await this.keepOneSuperAdmin(id);
+    if (dto.status === 'EXITED') await this.keepOneSuperAdmin(id);
     const updated = await this.prisma.employee.update({ where: { id }, data: this.toData(dto) as Prisma.EmployeeUncheckedUpdateInput, select: RESTRICTED_SELECT });
     await this.audit.log(actor.id, 'update', 'Employee', id, { fields: sentKeys(dto) });
+    if (before) await this.access.roleChanged(actor, id, before.role, updated.role);
     return updated;
   }
 

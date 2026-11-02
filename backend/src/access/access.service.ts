@@ -1,6 +1,7 @@
 import { AbilityBuilder, createMongoAbility, MongoAbility, MongoQuery, subject as asSubject } from '@casl/ability';
-import { ForbiddenException, Global, Injectable, Module, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Global, Injectable, Module, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ProjectRole, Role } from '@prisma/client';
+import { AuditService } from '../common/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { isPermissionKey, LOCATION_SCOPED_ROLES, PERMISSION_KEYS, PermissionKey } from './permissions';
 
@@ -105,6 +106,19 @@ export function hasPermission(a: Actor, k: PermissionKey) {
   return a.role === 'SUPER_ADMIN' || a.permissions.includes(k);
 }
 
+/**
+ * Why `actor` may not move `target` from its role to `next`, or null if they may.
+ * Only super admins change roles; nobody changes their own super-admin access;
+ * the last active super admin keeps the role.
+ */
+export function roleChangeError(actor: Pick<Actor, 'id' | 'role'>, target: { id: string; role: Role }, next: Role, otherActiveSuperAdmins: number): string | null {
+  if (target.role === next) return null;
+  if (actor.role !== 'SUPER_ADMIN') return 'Only a super admin can change roles';
+  if (target.id === actor.id) return 'You can’t change your own role';
+  if (target.role === 'SUPER_ADMIN' && otherActiveSuperAdmins === 0) return 'This is the last super admin. Make someone else super admin first.';
+  return null;
+}
+
 interface Grants {
   roles: Map<Role, Set<PermissionKey>>;
   overrides: Map<string, [PermissionKey, boolean][]>;
@@ -117,7 +131,7 @@ const GRANTS_TTL_MS = 60_000;
 export class AccessService {
   private grants: { at: number; value: Promise<Grants> } | null = null;
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService) {}
 
   /** Who holds which permission, cached; call `invalidate()` after changing it. */
   loadGrants(): Promise<Grants> {
@@ -139,6 +153,24 @@ export class AccessService {
 
   invalidate() {
     this.grants = null;
+  }
+
+  /** Throws unless `actor` may give `targetId` the role `next` (see roleChangeError). */
+  async assertRoleChange(actor: Actor, targetId: string, next: Role) {
+    const target = await this.prisma.employee.findUnique({ where: { id: targetId }, select: { id: true, role: true } });
+    if (!target) throw new NotFoundException();
+    const others = await this.prisma.employee.count({ where: { role: 'SUPER_ADMIN', status: { not: 'EXITED' }, id: { not: targetId } } });
+    const error = roleChangeError(actor, target, next, others);
+    if (error) throw (actor.role === 'SUPER_ADMIN' ? new BadRequestException(error) : new ForbiddenException(error));
+    return target;
+  }
+
+  /** Records a role change. Super admins have everything, so their personal overrides are dropped. */
+  async roleChanged(actor: Actor, employeeId: string, from: Role, to: Role) {
+    if (from === to) return;
+    const dropped = to === 'SUPER_ADMIN' ? (await this.prisma.permissionOverride.deleteMany({ where: { employeeId } })).count : 0;
+    this.invalidate();
+    await this.audit.log(actor.id, 'change-role', 'Employee', employeeId, { from, to, ...(dropped ? { droppedOverrides: dropped } : {}) });
   }
 
   async permissionsOf(employeeId: string, role: Role) {

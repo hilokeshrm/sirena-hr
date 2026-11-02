@@ -1,11 +1,11 @@
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Injectable, Module, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Injectable, Module, NotFoundException, Param, Patch, Post, Put } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { IsBoolean } from 'class-validator';
+import { IsBoolean, IsEnum } from 'class-validator';
 import { CurrentActor } from '../auth/auth.guard';
 import { AuditService } from '../common/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccessService, Actor, effectivePermissions } from './access.service';
-import { defaultPermissionsFor, EDITABLE_ROLES, isPermissionKey, PERMISSIONS, PermissionKey } from './permissions';
+import { defaultPermissionsFor, describeEffect, EDITABLE_ROLES, isPermissionKey, PERMISSION_KEYS, PERMISSIONS, PermissionKey } from './permissions';
 
 class RoleGrantDto {
   @IsBoolean() enabled!: boolean;
@@ -13,6 +13,10 @@ class RoleGrantDto {
 
 class OverrideDto {
   @IsBoolean() granted!: boolean;
+}
+
+class RoleDto {
+  @IsEnum(Role) role!: Role;
 }
 
 /** Super admin only: which role (or person) holds which permission. */
@@ -89,7 +93,22 @@ export class AccessAdminService {
     return this.matrix(actor);
   }
 
-  /** One person's role, overrides and resulting permissions. */
+  /** Everyone still working here, with their role and any personal overrides. */
+  async people(actor: Actor) {
+    this.check(actor);
+    const rows = await this.prisma.employee.findMany({
+      where: { status: { not: 'EXITED' } },
+      orderBy: { fullName: 'asc' },
+      select: {
+        id: true, code: true, fullName: true, email: true, role: true, status: true, designation: true,
+        department: { select: { id: true, name: true } }, location: { select: { id: true, name: true } },
+        permissionOverrides: { select: { permission: true, granted: true } },
+      },
+    });
+    return rows.map(({ permissionOverrides, ...e }) => ({ ...e, overrides: permissionOverrides.filter((o) => isPermissionKey(o.permission)) }));
+  }
+
+  /** One person's role, overrides and, for every permission, whether they have it and what that means. */
   async person(actor: Actor, employeeId: string) {
     this.check(actor);
     const emp = await this.prisma.employee.findUnique({
@@ -99,12 +118,33 @@ export class AccessAdminService {
     if (!emp) throw new NotFoundException();
     const roleGrants = (await this.prisma.rolePermission.findMany({ where: { role: emp.role } })).map((g) => g.permission).filter(isPermissionKey);
     const overrides = emp.permissionOverrides.filter((o) => isPermissionKey(o.permission)) as { permission: PermissionKey; granted: boolean }[];
+    const effective = effectivePermissions(emp.role, roleGrants, overrides.map((o) => [o.permission, o.granted]));
+    const superAdmin = emp.role === 'SUPER_ADMIN';
     return {
       employee: { id: emp.id, code: emp.code, fullName: emp.fullName, role: emp.role, status: emp.status },
-      roleGrants: emp.role === 'SUPER_ADMIN' ? [] : roleGrants,
-      overrides,
-      effective: effectivePermissions(emp.role, roleGrants, overrides.map((o) => [o.permission, o.granted])),
+      roleGrants: superAdmin ? [] : roleGrants,
+      overrides: superAdmin ? [] : overrides,
+      effective,
+      permissions: PERMISSION_KEYS.map((key) => {
+        const has = effective.includes(key);
+        const override = superAdmin ? undefined : overrides.find((o) => o.permission === key);
+        return {
+          key,
+          has,
+          fromRole: superAdmin || roleGrants.includes(key),
+          overridden: !!override,
+          effect: superAdmin ? 'Full access (super admin).' : describeEffect(key, emp.role, has),
+        };
+      }),
     };
+  }
+
+  async setRole(actor: Actor, employeeId: string, role: Role) {
+    this.check(actor);
+    const before = await this.access.assertRoleChange(actor, employeeId, role);
+    await this.prisma.employee.update({ where: { id: employeeId }, data: { role } });
+    await this.access.roleChanged(actor, employeeId, before.role, role);
+    return this.person(actor, employeeId);
   }
 
   async setOverride(actor: Actor, employeeId: string, key: string, granted: boolean | null) {
@@ -113,6 +153,7 @@ export class AccessAdminService {
     const emp = await this.prisma.employee.findUnique({ where: { id: employeeId }, select: { id: true, role: true } });
     if (!emp) throw new NotFoundException();
     if (emp.role === 'SUPER_ADMIN' && granted !== null) throw new BadRequestException('Super admins always have full access');
+    if (employeeId === actor.id) throw new BadRequestException('You can’t change your own access');
     if (granted === null) {
       await this.prisma.permissionOverride.deleteMany({ where: { employeeId, permission } });
     } else {
@@ -146,6 +187,16 @@ export class AccessAdminController {
   @Post('roles/reset')
   resetRoles(@CurrentActor() actor: Actor) {
     return this.svc.resetRoles(actor);
+  }
+
+  @Get('people')
+  people(@CurrentActor() actor: Actor) {
+    return this.svc.people(actor);
+  }
+
+  @Patch('people/:id')
+  setRole(@CurrentActor() actor: Actor, @Param('id') id: string, @Body() dto: RoleDto) {
+    return this.svc.setRole(actor, id, dto.role);
   }
 
   @Get('people/:id')
