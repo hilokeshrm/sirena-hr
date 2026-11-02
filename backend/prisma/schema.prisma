@@ -180,6 +180,8 @@ model LeaveType {
   sandwich            Boolean        @default(false)
   hrApproval          HrApproval     @default(ABOVE_DAYS)
   hrApprovalAboveDays Int            @default(3)
+  /// Only people of this gender get and can use it (e.g. maternity); null = everyone.
+  eligibleGender      String?
   active              Boolean        @default(true)
   requests            LeaveRequest[]
   ledger              LeaveLedger[]

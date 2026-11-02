@@ -33,6 +33,7 @@ class LeaveTypeDto {
   @IsOptional() @IsBoolean() sandwich?: boolean;
   @IsOptional() @IsEnum(HrApproval) hrApproval?: HrApproval;
   @IsOptional() @IsInt() hrApprovalAboveDays?: number;
+  @IsOptional() @IsString() eligibleGender?: string | null;
   @IsOptional() @IsBoolean() active?: boolean;
 }
 
@@ -64,6 +65,10 @@ const REQUEST_INCLUDE = {
 type RequestRow = Prisma.LeaveRequestGetPayload<{ include: typeof REQUEST_INCLUDE }>;
 
 const OPEN: LeaveStatus[] = ['PENDING_MANAGER', 'PENDING_HR'];
+
+/** Gender-specific types (maternity, paternity, period leave) apply only to matching people. */
+const eligible = (t: { eligibleGender: string | null }, gender: string | null | undefined) =>
+  !t.eligibleGender || t.eligibleGender.toLowerCase() === (gender ?? '').toLowerCase();
 
 @Injectable()
 export class LeaveService {
@@ -101,7 +106,8 @@ export class LeaveService {
   }
 
   async balances(employeeId: string, year = Number(todayIST().slice(0, 4))) {
-    const [types, ledger, pending] = await Promise.all([
+    const [me, allTypes, ledger, pending] = await Promise.all([
+      this.prisma.employee.findUnique({ where: { id: employeeId }, select: { gender: true } }),
       this.prisma.leaveType.findMany({ where: { active: true }, orderBy: { code: 'asc' } }),
       this.prisma.leaveLedger.groupBy({ by: ['leaveTypeId'], where: { employeeId, year }, _sum: { delta: true } }),
       this.prisma.leaveRequest.groupBy({
@@ -110,6 +116,7 @@ export class LeaveService {
         _sum: { days: true },
       }),
     ]);
+    const types = allTypes.filter((t) => eligible(t, me?.gender));
     return types.map((t) => {
       const balance = Number(ledger.find((l) => l.leaveTypeId === t.id)?._sum.delta ?? 0);
       const held = Number(pending.find((p) => p.leaveTypeId === t.id)?._sum.days ?? 0);
@@ -124,7 +131,8 @@ export class LeaveService {
   async preview(actor: Actor, dto: ApplyDto) {
     const type = await this.prisma.leaveType.findUnique({ where: { id: dto.leaveTypeId } });
     if (!type || !type.active) throw new BadRequestException('Unknown leave type');
-    const me = await this.prisma.employee.findUniqueOrThrow({ where: { id: actor.id }, select: { locationId: true } });
+    const me = await this.prisma.employee.findUniqueOrThrow({ where: { id: actor.id }, select: { locationId: true, gender: true } });
+    if (!eligible(type, me.gender)) throw new BadRequestException(`${type.name} is not available to you`);
     const from = dto.fromDate.slice(0, 10);
     const to = dto.toDate.slice(0, 10);
     if (to < from) throw new BadRequestException('End date is before start date');
@@ -299,13 +307,14 @@ export class LeaveService {
   async accrueMonth(actor: Actor, ability: AppAbility, year: number, month: number) {
     assertCan(ability, 'manage', 'LeaveType');
     const types = await this.prisma.leaveType.findMany({ where: { active: true, accrual: 'MONTHLY', yearlyQuota: { not: null } } });
-    const people = await this.prisma.employee.findMany({ where: { status: { in: ['ACTIVE', 'ON_NOTICE'] } }, select: { id: true, joinedOn: true } });
+    const people = await this.prisma.employee.findMany({ where: { status: { in: ['ACTIVE', 'ON_NOTICE'] } }, select: { id: true, joinedOn: true, gender: true } });
     const monthEnd = toDbDate(monthBounds(`${year}-${String(month).padStart(2, '0')}`).nextFirst);
     let credited = 0;
     for (const t of types) {
       const perMonth = Math.round((Number(t.yearlyQuota) / 12) * 10) / 10;
       for (const p of people) {
         if (p.joinedOn && p.joinedOn >= monthEnd) continue; // not yet joined that month
+        if (!eligible(t, p.gender)) continue;
         const refId = `accrual:${year}-${month}:${t.id}`;
         const exists = await this.prisma.leaveLedger.findFirst({ where: { employeeId: p.id, refId } });
         if (exists) continue;
@@ -321,11 +330,12 @@ export class LeaveService {
   async openYear(actor: Actor, ability: AppAbility, year: number) {
     assertCan(ability, 'manage', 'LeaveType');
     const types = await this.prisma.leaveType.findMany({ where: { active: true } });
-    const people = await this.prisma.employee.findMany({ where: { status: { in: ['ACTIVE', 'ON_NOTICE', 'ONBOARDING'] } }, select: { id: true } });
+    const people = await this.prisma.employee.findMany({ where: { status: { in: ['ACTIVE', 'ON_NOTICE', 'ONBOARDING'] } }, select: { id: true, gender: true } });
     let rows = 0;
     for (const p of people) {
       const prev = await this.balances(p.id, year - 1);
       for (const t of types) {
+        if (!eligible(t, p.gender)) continue;
         const ref = `open:${year}:${t.id}`;
         if (await this.prisma.leaveLedger.findFirst({ where: { employeeId: p.id, refId: ref } })) continue;
         const carry = Math.max(0, Math.min(prev.find((b) => b.leaveTypeId === t.id)?.balance ?? 0, Number(t.carryForwardMax)));
