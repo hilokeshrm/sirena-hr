@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'api.dart';
+import 'phone_alerts.dart';
 
 /// Who is signed in, and what the server says they may do.
 class Session extends ChangeNotifier {
@@ -9,7 +10,9 @@ class Session extends ChangeNotifier {
   static final instance = Session._();
 
   static const _storage = FlutterSecureStorage();
-  static const _key = 'sirena_token';
+  /// Also read by the background notification check.
+  static const tokenKey = 'sirena_token';
+  static const _key = tokenKey;
 
   String? token;
   Map<String, dynamic>? me;
@@ -29,7 +32,10 @@ class Session extends ChangeNotifier {
   Future<void> restore() async {
     try {
       token = await _storage.read(key: _key);
-      if (token != null) me = asMap(await Api.instance.get('/me'));
+      if (token != null) {
+        me = asMap(await Api.instance.get('/me'));
+        PhoneAlerts.start().ignore();
+      }
     } catch (_) {
       token = null;
       me = null;
@@ -44,6 +50,7 @@ class Session extends ChangeNotifier {
     await _storage.write(key: _key, value: token);
     me = asMap(await Api.instance.get('/me'));
     notifyListeners();
+    PhoneAlerts.start().ignore();
   }
 
   Future<void> refresh() async {
@@ -52,6 +59,7 @@ class Session extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    PhoneAlerts.stop().ignore();
     token = null;
     me = null;
     await _storage.delete(key: _key);
