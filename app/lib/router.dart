@@ -29,6 +29,25 @@ import 'features/projects/project_screen.dart';
 import 'features/projects/projects_screen.dart';
 import 'shell.dart';
 
+/// Admin pages and the `/me` permission each needs. Anyone else is sent home, so typing the
+/// address doesn't show an admin screen (the server refuses their actions either way).
+const adminPagePermissions = {
+  '/leave/approvals': 'approveLeave',
+  '/admin/employees': 'manageEmployees',
+  '/admin/attendance': 'viewAllAttendance',
+  '/admin/cafeteria': 'viewMealReport',
+  '/admin/policies': 'managePolicies',
+  '/admin/access': 'manageAccess',
+};
+
+/// The permission a path needs, or null for pages everyone may open.
+String? requiredPermission(String path) {
+  for (final e in adminPagePermissions.entries) {
+    if (path == e.key || path.startsWith('${e.key}/')) return e.value;
+  }
+  return null;
+}
+
 GoRoute _page(String path, Widget Function(GoRouterState s) build) =>
     GoRoute(path: path, pageBuilder: (context, state) => NoTransitionPage(child: build(state)));
 
@@ -43,6 +62,8 @@ final appRouter = GoRouter(
     if (!s.signedIn) return public ? null : '/login';
     if (s.mustChangePassword) return path == '/set-password' ? null : '/set-password';
     if (public || path == '/splash' || path == '/set-password') return '/';
+    final needed = requiredPermission(path);
+    if (needed != null && !s.can(needed)) return '/';
     return null;
   },
   routes: [

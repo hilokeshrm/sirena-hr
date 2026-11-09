@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api.dart';
 import '../../core/format.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/common.dart';
 
@@ -168,7 +169,8 @@ class _EmployeesAdminState extends State<EmployeesAdmin> {
         final (people, lookups) = data;
         return Scaffold(
           appBar: AppBar(title: const Text('Employees'), actions: [
-            Padding(
+            if (Session.instance.can('manageEmployees'))
+              Padding(
               padding: const EdgeInsets.only(right: 12),
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),

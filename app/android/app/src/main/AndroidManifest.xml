@@ -5,7 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <application
         android:label="Sirena HR"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

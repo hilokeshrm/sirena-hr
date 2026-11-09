@@ -46,15 +46,31 @@ class Session extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Changing the password ends every session on the server, so keep the fresh token it returns.
+  Future<void> changePassword(String current, String next) async {
+    final res = asMap(await Api.instance.post('/auth/change-password', {'currentPassword': current, 'newPassword': next}));
+    final fresh = res['accessToken'] as String?;
+    if (fresh != null) {
+      token = fresh;
+      await _storage.write(key: _key, value: fresh);
+    }
+    await refresh();
+  }
+
   Future<void> refresh() async {
     me = asMap(await Api.instance.get('/me'));
     notifyListeners();
   }
 
+  /// Forgets the token everywhere it was kept, even if storage fails, and returns to sign-in.
   Future<void> logout() async {
     token = null;
     me = null;
-    await _storage.delete(key: _key);
+    try {
+      await _storage.delete(key: _key);
+    } catch (_) {
+      // Nothing more to do: the in-memory token is already gone.
+    }
     notifyListeners();
   }
 }

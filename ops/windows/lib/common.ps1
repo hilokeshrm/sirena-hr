@@ -54,8 +54,9 @@ function Test-SshPasswordAuth { $c = Get-SirenaConfig; if ($null -eq $c.SshPassw
 # Port sshd listens on. Defaults to 22.
 function Get-SshPort { $c = Get-SirenaConfig; if ($c.SshPort) { [int]$c.SshPort } else { 22 } }
 
-# False keeps Postgres on localhost only: no remote listener, firewall rule or pg_hba entries. Defaults to true.
-function Test-DbExposed { $c = Get-SirenaConfig; if ($null -eq $c.DbExposed) { $true } else { [bool]$c.DbExposed } }
+# False keeps Postgres on localhost only: no remote listener, firewall rule or pg_hba entries.
+# Defaults to false: reach the database through an SSH tunnel unless DbExposed = $true is set on purpose.
+function Test-DbExposed { $c = Get-SirenaConfig; if ($null -eq $c.DbExposed) { $false } else { [bool]$c.DbExposed } }
 
 # Local port the API listens on. Defaults to 3000; set ApiPort in config.psd1 if something else uses it.
 function Get-ApiPort { $c = Get-SirenaConfig; if ($c.ApiPort) { [int]$c.ApiPort } else { 3000 } }
@@ -170,13 +171,28 @@ GRANT CONNECT ON DATABASE $DbName TO sirena_app, sirena_admin, sirena_ro;
   Grant-ReadOnly
 }
 
-# Gives sirena_ro read access to every table, including ones future migrations create.
+# Gives sirena_ro read access to every table, including ones future migrations create,
+# except secrets: password hashes, invite links and device tokens stay out of read-only reach.
+# Runs after every migration (deploy.ps1), so new columns on those tables are picked up.
 function Grant-ReadOnly {
   Invoke-Psql -Database $DbName @'
 ALTER SCHEMA public OWNER TO sirena_app;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 GRANT USAGE ON SCHEMA public TO sirena_ro;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO sirena_ro;
 ALTER DEFAULT PRIVILEGES FOR ROLE sirena_app IN SCHEMA public GRANT SELECT ON TABLES TO sirena_ro;
+DO $$
+DECLARE t text; cols text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['Employee', 'Invite', 'DeviceToken'] LOOP
+    IF to_regclass(format('public.%I', t)) IS NOT NULL THEN
+      EXECUTE format('REVOKE SELECT ON public.%I FROM sirena_ro', t);
+      SELECT string_agg(quote_ident(column_name), ', ') INTO cols FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = t AND column_name NOT IN ('passwordHash', 'token');
+      IF cols IS NOT NULL THEN EXECUTE format('GRANT SELECT (%s) ON public.%I TO sirena_ro', cols, t); END IF;
+    END IF;
+  END LOOP;
+END $$;
 '@ | Out-Null
 }
 
@@ -267,12 +283,11 @@ function Write-CaddyConfig {
   if ($cfg.DirectAccess) {
     if (-not $cfg.PublicIp) { throw 'DirectAccess requires PublicIp in config.psd1.' }
     $site = "https://$($cfg.PublicIp):$($cfg.PublicPort)"
-    $tls = "tls $root/certs/origin.pem $root/certs/origin.key"
   } else {
     $cf = @(Get-Content $CloudflareIpsPath | Where-Object { $_.Trim() })
     $site = $cfg.Domain
-    $tls = "tls $root/certs/origin.pem $root/certs/origin.key"
   }
+  $tls = "tls $root/certs/origin.pem $root/certs/origin.key {`n`t`tprotocols tls1.2 tls1.3`n`t}"
   $global = if ($cfg.DirectAccess) {
     "{`n`tauto_https disable_redirects`n`t# Clients that connect by IP send no SNI; serve the IP certificate to them.`n`tdefault_sni $($cfg.PublicIp)`n}"
   } else {
@@ -296,11 +311,27 @@ $site {
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
 		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy same-origin
+		# Only restricts what can't break the Flutter app: no framing, plugins, foreign <base> or form targets.
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
 		-Server
+		-X-Powered-By
+	}
+
+	# Nothing on this site lives under these; refuse probes for source or secrets outright.
+	@hidden path /.git/* /.env* */.env /backend/* /ops/*
+	handle @hidden {
+		respond 404
 	}
 
 	handle /api/* {
+		# Uploads are capped at 50 MB by the API; refuse anything far larger before it reaches it.
+		request_body {
+			max_size 60MB
+		}
 		reverse_proxy 127.0.0.1:$(Get-ApiPort) {
 			# The API trusts X-Forwarded-For from loopback; give it the real visitor IP.
 			header_up X-Forwarded-For {client_ip}
@@ -318,6 +349,15 @@ $site {
 			roll_size 20MiB
 			roll_keep 10
 		}
+		# One-minute download links carry a token in ?t=; keep it out of the log.
+		format filter {
+			wrap json
+			fields {
+				request>uri query {
+					delete t
+				}
+			}
+		}
 	}
 }
 "@
@@ -332,6 +372,32 @@ $site {
 }
 
 # ── Services ────────────────────────────────────────────────────────────
+
+# Each service's own virtual account (no password, no rights beyond what is granted here).
+$ApiAccount = "NT SERVICE\$ApiService"
+$CaddyAccount = "NT SERVICE\$CaddyService"
+$CaddyDataDir = Join-Path $SirenaRoot 'caddy-data'
+
+function Test-ServiceAccount([string]$Service) {
+  (Get-CimInstance Win32_Service -Filter "Name='$Service'" -ErrorAction SilentlyContinue).StartName -like 'NT SERVICE\*'
+}
+
+# What the API and Caddy need when they run as their own accounts instead of LocalSystem:
+# API reads its .env and writes uploaded files; Caddy reads the TLS key and keeps its own data; both write logs.
+# Safe to re-run (setup.ps1 rewrites .env and folder permissions, so it calls this again).
+function Grant-ServiceAccess {
+  if (Get-Service $ApiService -ErrorAction SilentlyContinue) {
+    Invoke-Native icacls.exe @("$RepoDirackend\.env", '/grant', "${ApiAccount}:R") | Out-Null
+    Invoke-Native icacls.exe @("$SirenaRootiles", '/grant', "${ApiAccount}:(OI)(CI)M") | Out-Null
+    Invoke-Native icacls.exe @($LogsDir, '/grant', "${ApiAccount}:(OI)(CI)M") | Out-Null
+  }
+  if (Get-Service $CaddyService -ErrorAction SilentlyContinue) {
+    New-Item -ItemType Directory -Force $CaddyDataDir | Out-Null
+    Invoke-Native icacls.exe @("$SirenaRoot\certs", '/grant', "${CaddyAccount}:(OI)(CI)R") | Out-Null
+    Invoke-Native icacls.exe @($CaddyDataDir, '/grant', "${CaddyAccount}:(OI)(CI)M") | Out-Null
+    Invoke-Native icacls.exe @($LogsDir, '/grant', "${CaddyAccount}:(OI)(CI)M") | Out-Null
+  }
+}
 
 # Stop-Service can sit in StopPending forever when the service wrapper hangs.
 # Ask politely, then end the wrapper and its node process.

@@ -27,6 +27,10 @@ foreach ($d in @($SirenaRoot, $SecretsDir, $LogsDir, $WwwDir, $ToolsBin, "$Siren
 }
 Protect-Folder $SecretsDir
 Protect-Folder "$SirenaRoot\certs"
+# Database dumps, uploaded files and logs hold personal data (and logs hold client IPs): admins and services only.
+Protect-Folder $BackupsDir
+Protect-Folder "$SirenaRoot\files"
+Protect-Folder $LogsDir
 # Lets the ops scripts run by path (e.g. over SSH); downloaded scripts still need a signature.
 # Group policy may override LocalMachine, so keep the existing effective policy when it
 # already permits this explicitly invoked setup.
@@ -114,7 +118,25 @@ $conf = $conf -replace '^#?\s*PasswordAuthentication\s+.*$', "PasswordAuthentica
               -replace '^#?\s*PubkeyAuthentication\s+.*$', 'PubkeyAuthentication yes'
 if (-not ($conf -match "^PasswordAuthentication $pwAuth")) { $conf = @("PasswordAuthentication $pwAuth") + $conf }
 if ((Get-SshPort) -ne 22) { $conf = @("Port $(Get-SshPort)") + @($conf | Where-Object { $_ -notmatch '^#?\s*Port\s+\d+' }) }
+# Fewer guesses per connection, no empty passwords, no keyboard-interactive fallback, no forwarding beyond the DB tunnel.
+# Global options go first: sshd uses the first value it reads, and the file ends in a Match block.
+$hardening = [ordered]@{
+  PermitEmptyPasswords = 'no'; ChallengeResponseAuthentication = 'no'; MaxAuthTries = '3'; LoginGraceTime = '30'
+  AllowAgentForwarding = 'no'; GatewayPorts = 'no'; PermitTunnel = 'no'; X11Forwarding = 'no'
+}
+foreach ($k in $hardening.Keys) { $conf = @("$k $($hardening[$k])") + @($conf | Where-Object { $_ -notmatch "^#?\s*$k\s+" }) }
+$sshdBackup = "$sshdConfig.sirena-bak"
+Copy-Item $sshdConfig $sshdBackup -Force
 [IO.File]::WriteAllLines($sshdConfig, [string[]]$conf)
+# A bad sshd_config would lock everyone out at the next restart: test it, and put the old one back if it fails.
+$old = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+$sshdTest = & "$env:SystemRoot\System32\OpenSSH\sshd.exe" -t 2>&1
+$sshdOk = ($LASTEXITCODE -eq 0)
+$ErrorActionPreference = $old
+if (-not $sshdOk) {
+  Copy-Item $sshdBackup $sshdConfig -Force
+  Write-Note "sshd rejected the hardened config, so the previous one was restored: $($sshdTest -join ' ')"
+}
 if (-not (Test-Path $AdminKeysPath)) { New-Item -ItemType File $AdminKeysPath | Out-Null }
 Invoke-Native icacls.exe @($AdminKeysPath, '/inheritance:r', '/grant', '*S-1-5-32-544:F', '/grant', '*S-1-5-18:F') | Out-Null
 New-Item -Path 'HKLM:\SOFTWARE\OpenSSH' -Force | Out-Null
@@ -276,6 +298,7 @@ DATABASE_URL="postgresql://sirena_app:$(Get-Secret 'db-app')@127.0.0.1:$($cfg.Pg
 JWT_SECRET="$(Get-Secret 'jwt')"
 JWT_EXPIRES_IN="12h"
 PORT=$(Get-ApiPort)
+HOST=127.0.0.1
 FILES_DIR="C:/sirena/files"
 MEAL_CUTOFF="$($cfg.MealCutoff)"
 TRUST_PROXY=true
@@ -329,7 +352,11 @@ function Install-NssmService([string]$Name, [string]$Exe, [string]$Arguments, [s
 $node = (Get-Command node.exe).Source
 Install-NssmService $ApiService $node 'dist\main.js' "$RepoDir\backend" "$LogsDir\api.log" $PgService
 Install-NssmService $CaddyService $caddy "run --config $SirenaRoot\Caddyfile --adapter caddyfile" $SirenaRoot "$LogsDir\caddy.log" ''
+# Caddy keeps its state here rather than in the running account's profile.
+Invoke-Native $nssm @('set', $CaddyService, 'AppEnvironmentExtra', "XDG_DATA_HOME=$CaddyDataDir", "XDG_CONFIG_HOME=$CaddyDataDir") | Out-Null
+Grant-ServiceAccess
 Write-Ok "$ApiService and $CaddyService installed (auto-start, restart on crash)"
+if (-not (Test-ServiceAccount $ApiService)) { Write-Note 'They run as LocalSystem. Run harden-services.ps1 to give each its own limited account.' }
 
 # ── 12. First build and deploy ──────────────────────────────────────────
 Write-Step 'First build (API + website)'

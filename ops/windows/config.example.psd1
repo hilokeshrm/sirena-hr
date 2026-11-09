@@ -17,7 +17,7 @@
 
   PgMajor      = 17
   PgPort       = 5432
-  # DbExposed = $false   # keep Postgres on localhost only (no remote access)
+  # DbExposed = $true    # let allowlisted IPs reach Postgres directly (default: localhost only, use an SSH tunnel)
   # SshPort   = 22       # port sshd listens on
   # UseTailscale = $false   # skip Tailscale sign-in (default true)
   # SshPasswordAuth = $true   # allow Windows account passwords over SSH (default false: keys only)

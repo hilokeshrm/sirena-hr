@@ -100,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     if (ok != true || !mounted) return;
-    await attempt(context, () => Api.instance.post('/auth/change-password', {'currentPassword': current.text, 'newPassword': next.text}), success: 'Password changed');
+    await attempt(context, () => Session.instance.changePassword(current.text, next.text), success: 'Password changed');
   }
 
   @override

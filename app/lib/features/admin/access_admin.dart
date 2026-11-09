@@ -69,7 +69,9 @@ class _AccessAdminState extends State<AccessAdmin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Roles & access'), actions: [
-        TextButton.icon(onPressed: _reset, icon: const Icon(Icons.restart_alt, size: 18), label: const Text('Reset')),
+        // Resetting every role is a super-admin action; the server refuses it for anyone else too.
+        if (Session.instance.can('admin'))
+          TextButton.icon(onPressed: _reset, icon: const Icon(Icons.restart_alt, size: 18), label: const Text('Reset')),
       ]),
       body: Fetch<Map<String, dynamic>>(
         key: _key,
