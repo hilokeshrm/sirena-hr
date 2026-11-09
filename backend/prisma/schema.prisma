@@ -77,6 +77,8 @@ model Employee {
   code              String         @unique
   email             String         @unique
   passwordHash      String?
+  /// Set when HR gives a temporary password; the app makes them choose a new one at sign-in.
+  mustChangePassword Boolean       @default(false)
   role              Role           @default(EMPLOYEE)
   status            EmployeeStatus @default(ACTIVE)
 

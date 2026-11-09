@@ -75,7 +75,8 @@ export class AuthService {
     if (!emp.passwordHash || !(await bcrypt.compare(dto.currentPassword, emp.passwordHash))) {
       throw new BadRequestException('Current password is wrong');
     }
-    await this.prisma.employee.update({ where: { id: actor.id }, data: { passwordHash: await bcrypt.hash(dto.newPassword, 12) } });
+    if (dto.newPassword === dto.currentPassword) throw new BadRequestException('Choose a new password that is different from the current one');
+    await this.prisma.employee.update({ where: { id: actor.id }, data: { passwordHash: await bcrypt.hash(dto.newPassword, 12), mustChangePassword: false } });
     await this.audit.log(actor.id, 'change-password', 'Employee', actor.id);
     return { ok: true };
   }
@@ -117,7 +118,7 @@ export class AuthService {
     await this.prisma.$transaction([
       this.prisma.employee.update({
         where: { id: inv.employeeId },
-        data: { ...rest, dateOfBirth: dateOfBirth ? toDbDate(dateOfBirth.slice(0, 10)) : undefined, passwordHash: await bcrypt.hash(password, 12), status: 'ACTIVE' },
+        data: { ...rest, dateOfBirth: dateOfBirth ? toDbDate(dateOfBirth.slice(0, 10)) : undefined, passwordHash: await bcrypt.hash(password, 12), mustChangePassword: false, status: 'ACTIVE' },
       }),
       this.prisma.invite.update({ where: { token }, data: { usedAt: new Date() } }),
     ]);
@@ -162,7 +163,7 @@ export class AuthController {
       where: { id: actor.id },
       select: {
         id: true, code: true, email: true, role: true, fullName: true, preferredName: true, designation: true, foodPref: true,
-        workMode: true, phone: true, joinedOn: true,
+        workMode: true, phone: true, joinedOn: true, mustChangePassword: true,
         department: { select: { id: true, name: true } }, location: { select: { id: true, name: true } },
         manager: { select: { id: true, fullName: true } },
       },

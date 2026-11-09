@@ -225,6 +225,17 @@ export class AttendanceService {
     return { date: day, veg: n('VEG'), nonVeg: n('NON_VEG'), none: n('NONE'), total: n('VEG') + n('NON_VEG') };
   }
 
+  /** Who booked lunch for a day at one location, for the kitchen and admins. */
+  async bookings(ability: AppAbility, day: string, locationId?: string) {
+    assertCan(ability, 'read', 'MealReport');
+    const rows = await this.prisma.mealBooking.findMany({
+      where: { date: toDbDate(day), status: { not: 'CANCELLED' }, choice: { not: 'NONE' }, ...(locationId ? { employee: { locationId } } : {}) },
+      select: { choice: true, status: true, employee: { select: { fullName: true, code: true, department: { select: { name: true } } } } },
+      orderBy: { employee: { fullName: 'asc' } },
+    });
+    return rows.map((r) => ({ name: r.employee.fullName, code: r.employee.code, department: r.employee.department?.name ?? null, choice: r.choice, status: r.status }));
+  }
+
   async setMenu(ability: AppAbility, day: string, dto: MenuDto) {
     assertCan(ability, 'read', 'MealReport');
     return this.prisma.mealMenu.upsert({
@@ -291,6 +302,11 @@ export class AttendanceController {
   @Get('meals/counts')
   counts(@CurrentAbility() ability: AppAbility, @Query('date') date?: string, @Query('locationId') locationId?: string) {
     return this.svc.counts(ability, day(date, todayIST()), locationId);
+  }
+
+  @Get('meals/bookings')
+  bookings(@CurrentAbility() ability: AppAbility, @Query('date') date?: string, @Query('locationId') locationId?: string) {
+    return this.svc.bookings(ability, day(date, todayIST()), locationId);
   }
 
   @Put('meals/menu/:date')

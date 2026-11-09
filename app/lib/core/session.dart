@@ -24,6 +24,7 @@ class Session extends ChangeNotifier {
 
   Map<String, dynamic> get permissions => (me?['permissions'] as Map?)?.cast<String, dynamic>() ?? const {};
   bool can(String permission) => permissions[permission] == true;
+  bool get mustChangePassword => me?['mustChangePassword'] == true;
 
   Future<void> restore() async {
     try {

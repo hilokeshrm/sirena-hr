@@ -87,6 +87,27 @@ class _CafeteriaAdminState extends State<CafeteriaAdmin> {
             ]),
           ),
           const SizedBox(height: 24),
+          const SectionTitle('Who ordered'),
+          Fetch<List<Map<String, dynamic>>>(
+            key: ValueKey('who$d$_locationId'),
+            load: () async => asList(await Api.instance.get('/meals/bookings', {'date': d, if (_locationId != null) 'locationId': _locationId})),
+            builder: (context, rows, _) => rows.isEmpty
+                ? const Panel(child: Text('Nobody has ordered lunch for this day yet.'))
+                : Panel(
+                    padding: EdgeInsets.zero,
+                    child: Column(children: [
+                      for (final r in rows)
+                        ListTile(
+                          dense: true,
+                          leading: FoodMark(veg: r['choice'] == 'VEG'),
+                          title: Text('${r['name']}', style: const TextStyle(fontWeight: FontWeight.w700)),
+                          subtitle: Text([r['code'], r['department']].whereType<String>().join(' · ')),
+                          trailing: Text(r['choice'] == 'VEG' ? 'Veg' : 'Non-veg'),
+                        ),
+                    ]),
+                  ),
+          ),
+          const SizedBox(height: 24),
           SectionTitle('Menu for ${niceDay(d)}'),
           TextField(controller: _veg, decoration: inputDeco('Veg menu').copyWith(prefixIcon: const Padding(padding: EdgeInsets.all(14), child: FoodMark(veg: true)))),
           gap12,

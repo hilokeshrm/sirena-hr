@@ -9,6 +9,7 @@ import 'features/admin/cafeteria_admin.dart';
 import 'features/admin/employees_admin.dart';
 import 'features/admin/policies_admin.dart';
 import 'features/attendance/attendance_screen.dart';
+import 'features/auth/change_password_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/auth/signup_screen.dart';
 import 'features/home/home_screen.dart';
@@ -40,12 +41,14 @@ final appRouter = GoRouter(
     final public = path == '/login' || path.startsWith('/signup/');
     if (!s.ready) return path == '/splash' ? null : '/splash';
     if (!s.signedIn) return public ? null : '/login';
-    if (public || path == '/splash') return '/';
+    if (s.mustChangePassword) return path == '/set-password' ? null : '/set-password';
+    if (public || path == '/splash' || path == '/set-password') return '/';
     return null;
   },
   routes: [
     GoRoute(path: '/splash', builder: (_, __) => const _Splash()),
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+    GoRoute(path: '/set-password', builder: (_, __) => const ChangePasswordScreen()),
     GoRoute(path: '/signup/:token', builder: (_, s) => SignupScreen(token: s.pathParameters['token']!)),
     ShellRoute(
       builder: (context, state, child) => AppShell(location: state.uri.path, child: child),
