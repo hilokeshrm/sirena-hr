@@ -410,11 +410,17 @@ function Stop-ApiService([int]$TimeoutSeconds = 30) {
     if ((Get-Service $ApiService).Status -eq 'Stopped') { return }
     Start-Sleep -Seconds 1
   }
-  $wrapperPid = (Get-CimInstance Win32_Service -Filter "Name='$ApiService'").ProcessId
-  if ($wrapperPid) {
+  # Only ever end the service's own wrapper (nssm.exe) and its node.exe / conhost.exe; never anything else.
+  $wrapperPid = [int](Get-CimInstance Win32_Service -Filter "Name='$ApiService'").ProcessId
+  $wrapper = if ($wrapperPid -gt 4) { Get-CimInstance Win32_Process -Filter "ProcessId=$wrapperPid" } else { $null }
+  if ($wrapper -and $wrapper.Name -eq 'nssm.exe') {
     Write-Note "API service did not stop in $TimeoutSeconds s; ending it"
-    Get-CimInstance Win32_Process -Filter "ParentProcessId=$wrapperPid" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    Get-CimInstance Win32_Process -Filter "ParentProcessId=$wrapperPid" |
+      Where-Object { $_.Name -in @('node.exe', 'conhost.exe') } |
+      ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
     Stop-Process -Id $wrapperPid -Force -ErrorAction SilentlyContinue
+  } else {
+    Write-Note "API service did not stop in $TimeoutSeconds s and its process isn't nssm.exe; leaving it alone"
   }
   $deadline = (Get-Date).AddSeconds(15)
   while ((Get-Service $ApiService).Status -ne 'Stopped' -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
