@@ -236,8 +236,9 @@ export class AttendanceService {
     return rows.map((r) => ({ name: r.employee.fullName, code: r.employee.code, department: r.employee.department?.name ?? null, choice: r.choice, status: r.status }));
   }
 
-  async setMenu(ability: AppAbility, day: string, dto: MenuDto) {
+  async setMenu(actor: Actor, ability: AppAbility, day: string, dto: MenuDto) {
     assertCan(ability, 'read', 'MealReport');
+    await this.audit.log(actor.id, 'set-menu', 'MealMenu', `${day}:${dto.locationId}`);
     return this.prisma.mealMenu.upsert({
       where: { date_locationId: { date: toDbDate(day), locationId: dto.locationId } },
       create: { date: toDbDate(day), ...dto },
@@ -310,8 +311,8 @@ export class AttendanceController {
   }
 
   @Put('meals/menu/:date')
-  menu(@CurrentAbility() ability: AppAbility, @Param('date') date: string, @Body() dto: MenuDto) {
-    return this.svc.setMenu(ability, day(date, ''), dto);
+  menu(@CurrentActor() actor: Actor, @CurrentAbility() ability: AppAbility, @Param('date') date: string, @Body() dto: MenuDto) {
+    return this.svc.setMenu(actor, ability, day(date, ''), dto);
   }
 }
 

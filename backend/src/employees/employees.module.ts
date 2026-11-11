@@ -114,14 +114,19 @@ export class EmployeesService {
   }
 
   async update(actor: Actor, ability: AppAbility, id: string, dto: EmployeeDto) {
-    const emp = await this.prisma.employee.findUnique({ where: { id }, select: { id: true, locationId: true } });
+    const emp = await this.prisma.employee.findUnique({ where: { id }, select: { id: true, locationId: true, role: true } });
     if (!emp) throw new NotFoundException();
+    // Only super admins edit a super admin's record (their email, status, location...).
+    if (emp.role === 'SUPER_ADMIN' && actor.role !== 'SUPER_ADMIN' && emp.id !== actor.id) throw new ForbiddenException('Only a super admin can edit this person');
     // HR (in scope for this person's location) may edit everything; others only their own contact details.
     const isHrEdit = canDo(ability, 'create', 'Employee', { locationId: emp.locationId });
     if (!isHrEdit) {
       assertCan(ability, 'update', 'Employee', { id: emp.id, locationId: emp.locationId });
       const blocked = sentKeys(dto).filter((k) => !SELF_EDITABLE.includes(k as keyof EmployeeDto));
       if (blocked.length) throw new BadRequestException(`You can't change: ${blocked.join(', ')}. Ask HR.`);
+    } else if (dto.locationId !== undefined && dto.locationId !== emp.locationId) {
+      // HR limited to one location may not move someone to a location they don't manage.
+      assertCan(ability, 'create', 'Employee', { locationId: dto.locationId });
     }
     const before = dto.role ? await this.access.assertRoleChange(actor, id, dto.role) : null;
     if (dto.managerId === id) throw new BadRequestException('Someone cannot report to themselves');

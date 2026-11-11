@@ -16,6 +16,8 @@ export interface Actor {
   projects: { projectId: string; role: ProjectRole }[];
   /** Permissions held through the person's role and personal overrides. */
   permissions: PermissionKey[];
+  /** Signed in with a temporary password that must be changed before anything else. */
+  mustChangePassword?: boolean;
 }
 
 export type Action =
@@ -169,6 +171,8 @@ export class AccessService {
   async roleChanged(actor: Actor, employeeId: string, from: Role, to: Role) {
     if (from === to) return;
     const dropped = to === 'SUPER_ADMIN' ? (await this.prisma.permissionOverride.deleteMany({ where: { employeeId } })).count : 0;
+    // Their open sessions end, so the app reloads what they may see.
+    await this.revokeSessions(employeeId);
     this.invalidate();
     await this.audit.log(actor.id, 'change-role', 'Employee', employeeId, { from, to, ...(dropped ? { droppedOverrides: dropped } : {}) });
   }
@@ -178,12 +182,22 @@ export class AccessService {
     return effectivePermissions(role, g.roles.get(role) ?? [], g.overrides.get(employeeId) ?? []);
   }
 
-  async loadActor(employeeId: string): Promise<Actor> {
+  /** Ends every session issued to this person so far (password change, role change). */
+  async revokeSessions(employeeId: string) {
+    await this.prisma.employee.update({ where: { id: employeeId }, data: { tokensValidFrom: sessionCutoff() } });
+  }
+
+  /** The person behind a token. `issuedAt` is the token's `iat` (seconds); tokens older than a revocation are refused. */
+  async loadActor(employeeId: string, issuedAt?: number): Promise<Actor> {
     const me = await this.prisma.employee.findUnique({
       where: { id: employeeId },
-      select: { id: true, role: true, status: true, locationId: true, departmentId: true, memberships: { select: { projectId: true, role: true } } },
+      select: {
+        id: true, role: true, status: true, locationId: true, departmentId: true, mustChangePassword: true, tokensValidFrom: true,
+        memberships: { select: { projectId: true, role: true } },
+      },
     });
     if (!me || me.status === 'EXITED') throw new UnauthorizedException();
+    if (!tokenStillValid(issuedAt, me.tokensValidFrom)) throw new UnauthorizedException();
 
     // Walk the reporting tree (org is small, so one query is fine).
     const all = await this.prisma.employee.findMany({ where: { status: { not: 'EXITED' } }, select: { id: true, managerId: true } });
@@ -199,12 +213,26 @@ export class AccessService {
     }
 
     const permissions = await this.permissionsOf(me.id, me.role);
-    return { id: me.id, role: me.role, locationId: me.locationId, departmentId: me.departmentId, managerOf, projects: me.memberships, permissions };
+    return {
+      id: me.id, role: me.role, locationId: me.locationId, departmentId: me.departmentId, managerOf, projects: me.memberships, permissions,
+      mustChangePassword: me.mustChangePassword,
+    };
   }
 
   ability(actor: Actor) {
     return defineAbilityFor(actor);
   }
+}
+
+/** Revocation time, rounded down to whole seconds because token `iat` is in seconds. */
+export function sessionCutoff(now = Date.now()) {
+  return new Date(Math.floor(now / 1000) * 1000);
+}
+
+/** False when the token was issued before the person's sessions were revoked (or has no issue time). */
+export function tokenStillValid(issuedAt: number | undefined, validFrom: Date | null) {
+  if (!validFrom) return true;
+  return typeof issuedAt === 'number' && issuedAt * 1000 >= validFrom.getTime();
 }
 
 /** Throws 403 unless the actor may perform `action` on this record. */

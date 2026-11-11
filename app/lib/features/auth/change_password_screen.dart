@@ -35,8 +35,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       _error = null;
     });
     try {
-      await Api.instance.post('/auth/change-password', {'currentPassword': _current.text, 'newPassword': _next.text});
-      await Session.instance.refresh();
+      await Session.instance.changePassword(_current.text, _next.text);
     } on ApiError catch (e) {
       setState(() => _error = e.message);
     } finally {

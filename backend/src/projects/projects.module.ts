@@ -16,6 +16,7 @@ import { AuditService, NotifyService } from '../common/audit.service';
 import { fromDbDate, sentKeys, toDbDate } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
 import { CurrentAbility, CurrentActor, Public } from '../auth/auth.guard';
+import { uploadProblem } from './upload-rules';
 
 class ProjectDto {
   @IsOptional() @IsString() code?: string;
@@ -223,6 +224,8 @@ export class ProjectsService {
 
   async upload(actor: Actor, ability: AppAbility, folderId: string, file: Express.Multer.File | undefined) {
     if (!file) throw new BadRequestException('Choose a file to upload');
+    const problem = uploadProblem(file.originalname);
+    if (problem) throw new BadRequestException(problem);
     const folder = await this.prisma.folder.findUnique({ where: { id: folderId } });
     if (!folder) throw new NotFoundException();
     if (!this.canSeeAll(actor)) assertCan(ability, 'upload', 'Folder', this.folderSubject(folder));
@@ -248,7 +251,14 @@ export class ProjectsService {
   async download(actor: Actor, ability: AppAbility, fileId: string, res: Response) {
     const file = await this.checkFileAccess(actor, ability, fileId);
     await this.audit.log(actor.id, 'download', 'ProjectFile', file.id);
-    res.set({ 'Content-Type': file.mime, 'Content-Disposition': `attachment; filename="${encodeURIComponent(file.name)}"` });
+    // Always a download, never rendered: the stored type comes from the uploader and isn't trusted.
+    res.set({
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="${file.name.replace(/[^\w.\- ]/g, '_')}"; filename*=UTF-8''${encodeURIComponent(file.name)}`,
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': "default-src 'none'; sandbox",
+      'Cache-Control': 'private, no-store',
+    });
     return new StreamableFile(createReadStream(path.join(this.filesDir, file.storageKey)));
   }
 }
@@ -318,7 +328,7 @@ export class ProjectsController {
   }
 
   @Post('folders/:id/files')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_UPLOAD } }))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_UPLOAD, files: 1, fields: 5, parts: 6 } }))
   upload(@CurrentActor() actor: Actor, @CurrentAbility() ability: AppAbility, @Param('id') id: string, @UploadedFile() file?: Express.Multer.File) {
     return this.svc.upload(actor, ability, id, file);
   }
@@ -338,14 +348,14 @@ export class ProjectsController {
 
   @Public() @Get('files/:id/dl')
   async signedDownload(@Param('id') id: string, @Query('t') t: string, @Res({ passthrough: true }) res: Response) {
-    let payload: { sub: string; fid: string };
+    let payload: { sub: string; fid: string; iat?: number };
     try {
-      payload = await this.jwt.verifyAsync(t);
+      payload = await this.jwt.verifyAsync(t ?? '');
     } catch {
       throw new UnauthorizedException('This download link has expired');
     }
-    if (payload.fid !== id) throw new UnauthorizedException();
-    const actor = await this.access.loadActor(payload.sub);
+    if (!payload.fid || payload.fid !== id) throw new UnauthorizedException();
+    const actor = await this.access.loadActor(payload.sub, payload.iat);
     return this.svc.download(actor, this.access.ability(actor), id, res);
   }
 }
