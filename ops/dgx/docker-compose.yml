@@ -1,0 +1,64 @@
+# Sirena HR on the DGX Spark. Run from ~/sirena-hr/ops/dgx with `docker compose up -d`.
+# Only Caddy is reachable from outside (port 7777). The API listens on the DGX's loopback and the
+# database on 127.0.0.1:5433, so neither can be reached from the network.
+name: sirena-hr
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sirena_hr
+      POSTGRES_USER: sirena_app
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    secrets: [db_password]
+    volumes:
+      - ${SIRENA_HOME}/pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sirena_app -d sirena_hr"]
+      interval: 10s
+      retries: 10
+
+  api:
+    build: ../../backend
+    image: sirena-hr-api:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # Host networking: the API binds 127.0.0.1:3100 on the DGX and sees Caddy as loopback,
+    # so it trusts Caddy's X-Forwarded-For and gets each visitor's real IP.
+    network_mode: host
+    env_file: ${SIRENA_HOME}/secrets/api.env
+    volumes:
+      - ${SIRENA_HOME}/files:/data/files
+    user: "${SIRENA_UID}:${SIRENA_GID}"
+    read_only: true
+    tmpfs: [/tmp, /home/node]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  web:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on: [api]
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${SIRENA_HOME}/www:/srv/www:ro
+      - ${SIRENA_HOME}/certs:/certs:ro
+      - ${SIRENA_HOME}/logs:/logs
+      - ${SIRENA_HOME}/caddy-data:/data
+    # Runs as the DGX user that owns the folders; 7777 needs no special privilege.
+    user: "${SIRENA_UID}:${SIRENA_GID}"
+    tmpfs: [/config]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+secrets:
+  db_password:
+    file: ${SIRENA_HOME}/secrets/db_password

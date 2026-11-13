@@ -1,0 +1,65 @@
+{
+	auto_https disable_redirects
+	# Clients that connect by IP send no SNI; serve the IP certificate to them.
+	default_sni 106.51.70.71
+	admin off
+}
+
+https://106.51.70.71:7777, https://192.168.88.12:7777 {
+	tls /certs/server.pem /certs/server.key {
+		protocols tls1.2 tls1.3
+	}
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy same-origin
+		# Only restricts what can't break the Flutter app: no framing, plugins, foreign <base> or form targets.
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+		-Server
+		-X-Powered-By
+	}
+
+	# Nothing on this site lives under these; refuse probes for source or secrets outright.
+	@hidden path /.git/* /.env* */.env /backend/* /ops/*
+	handle @hidden {
+		respond 404
+	}
+
+	handle /api/* {
+		# Uploads are capped at 50 MB by the API; refuse anything far larger before it reaches it.
+		request_body {
+			max_size 60MB
+		}
+		reverse_proxy 127.0.0.1:3100 {
+			# The API trusts X-Forwarded-For from loopback; give it the real visitor IP.
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+
+	handle {
+		root * /srv/www
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output file /logs/caddy-access.log {
+			roll_size 20MiB
+			roll_keep 10
+		}
+		# One-minute download links carry a token in ?t=; keep it out of the log.
+		format filter {
+			wrap json
+			fields {
+				request>uri query {
+					delete t
+				}
+			}
+		}
+	}
+}
