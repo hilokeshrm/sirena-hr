@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/api.dart';
+import '../../core/config.dart';
 import '../../core/format.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
@@ -80,6 +82,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) setState(() => _key = UniqueKey());
     }
   }
+
+  Future<void> _emailSupport() => launchUrl(Uri(
+        scheme: 'mailto',
+        path: AppConfig.supportEmail,
+        queryParameters: {'subject': 'Sirena HR app', 'body': '\n\n---\nSent by ${Session.instance.me?['email'] ?? ''}'},
+      ));
 
   Future<void> _changePassword() async {
     final current = TextEditingController();
@@ -193,6 +201,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () => Session.instance.logout(),
             icon: const Icon(Icons.logout, size: 18),
             label: const Text('Sign out'),
+          ),
+          const SizedBox(height: 20),
+          const SectionTitle('Help'),
+          Panel(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('Leave, attendance or your details wrong? Ask HR.', style: TextStyle(fontSize: 13)),
+              const SizedBox(height: 6),
+              const Text('Something broken in the app itself?', style: TextStyle(fontSize: 13)),
+              TextButton.icon(
+                onPressed: _emailSupport,
+                style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 36)),
+                icon: const Icon(Icons.mail_outline, size: 18),
+                label: const Text(AppConfig.supportEmail),
+              ),
+            ]),
           ),
         ]),
       ),

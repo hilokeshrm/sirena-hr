@@ -8,6 +8,9 @@ class AppConfig {
   /// When set, phones trust exactly that certificate; leave empty for a normal CA-signed one.
   static const serverCertSha256 = String.fromEnvironment('SERVER_CERT_SHA256');
 
+  /// Who to write to when something is wrong with the app itself.
+  static const supportEmail = 'dev@sirenatech.com';
+
   /// Server origin without the /api suffix (used for download links).
   static String get origin => apiBase.endsWith('/api') ? apiBase.substring(0, apiBase.length - 4) : apiBase;
 }

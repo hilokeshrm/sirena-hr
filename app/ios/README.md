@@ -15,7 +15,8 @@ app on other people's phones.
 | Office Wi-Fi detection | `Runner/Runner.entitlements` asks for *Access WiFi Information* |
 | Notifications while closed | Background task `sirena-check-notifications`, allowed in `Info.plist` and registered in `AppDelegate.swift` |
 | Unused permissions | Stripped in `Podfile`, so review doesn't ask about contacts, photos and the rest |
-| App icon | Generated from `assets/sirena-logo.png` into `Runner/Assets.xcassets` |
+| App icon | The Sirena eyes on the app's dark background, made by `tool/make-icons.py` |
+| Support contact | `dev@sirenatech.com`, shown on the sign-in screen and under **Me → Help** |
 | Server certificate | Checked by the app itself (`lib/core/pinning_io.dart`), which works on iPhone exactly as on Android |
 
 ## On the Mac, once
@@ -77,6 +78,9 @@ lines. Nothing else about the build differs from Android.
 - **App Store** is not suitable: this app is only useful to Sirena staff, and Apple rejects apps that the
   public can't use.
 - **Apple Business Manager** (Custom Apps) distributes privately and permanently, but takes more setup.
+
+When filling in App Store Connect, use **dev@sirenatech.com** as the support email, the same address the
+app shows people.
 
 ## Worth knowing
 

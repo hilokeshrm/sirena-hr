@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../core/api.dart';
+import '../../core/config.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 
@@ -17,6 +20,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _busy = false;
   bool _hide = true;
   String? _error;
+
+  Future<void> _emailSupport() => launchUrl(Uri(
+        scheme: 'mailto',
+        path: AppConfig.supportEmail,
+        queryParameters: const {'subject': 'Sirena HR app'},
+      ));
 
   Future<void> _submit() async {
     setState(() {
@@ -89,6 +98,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 16),
             const Text('New here? Use the invite link HR sent you.\nForgot your password? Ask HR to reset it.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
+            TextButton(
+              onPressed: _emailSupport,
+              child: const Text('App not working? Email ${AppConfig.supportEmail}', style: TextStyle(fontSize: 13)),
+            ),
           ]),
         ),
       );
