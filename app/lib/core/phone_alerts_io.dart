@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -17,9 +19,17 @@ const _details = NotificationDetails(
   android: AndroidNotificationDetails('sirena_updates', 'Sirena HR updates',
       channelDescription: 'Leave decisions, requests to review and policies to read',
       importance: Importance.high, priority: Priority.high),
+  iOS: DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true),
 );
 
-/// Runs in the background (app closed) every ~15 minutes, when Android allows it.
+const _initSettings = InitializationSettings(
+  android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+  // Permission is asked for at sign-in instead, so the person knows why.
+  iOS: DarwinInitializationSettings(requestAlertPermission: false, requestBadgePermission: false, requestSoundPermission: false),
+);
+
+/// Runs in the background every ~15 minutes on Android. On iOS the system decides when, and only
+/// while the person uses the app regularly; it can be hours, or never if they force-quit the app.
 @pragma('vm:entry-point')
 void sirenaAlertsDispatcher() {
   Workmanager().executeTask((task, _) async {
@@ -50,7 +60,7 @@ Future<void> _checkAndShow({bool background = false}) async {
   // First run after sign-in: remember where we are instead of replaying old notifications.
   if (since == null) return;
   // In the app itself init() already set this up with the tap handler; setting it up again would drop it.
-  if (background) await _plugin.initialize(const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')));
+  if (background) await _plugin.initialize(_initSettings);
   for (final n in fresh) {
     await _plugin.show('${n['id']}'.hashCode & 0x7fffffff, 'Sirena HR', '${n['title']}', _details, payload: n['link'] as String?);
   }
@@ -62,7 +72,7 @@ class PhoneAlerts {
 
   static Future<void> init() async {
     await _plugin.initialize(
-      const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')),
+      _initSettings,
       onDidReceiveNotificationResponse: (r) => onOpen?.call(r.payload ?? '/notifications'),
     );
     final launch = await _plugin.getNotificationAppLaunchDetails();
@@ -75,7 +85,13 @@ class PhoneAlerts {
 
   /// After sign-in: ask permission and start the background check.
   static Future<void> start() async {
-    await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+    if (Platform.isIOS) {
+      await _plugin
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+    } else {
+      await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+    }
     await Workmanager().registerPeriodicTask(
       _task,
       _task,
