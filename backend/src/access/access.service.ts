@@ -81,7 +81,6 @@ export function defineAbilityFor(a: Actor): AppAbility {
   if (has('policies.manage')) can('manage', ['Policy', 'PolicyVersion']);
   if (has('meals.viewReport')) can('read', 'MealReport');
   if (has('projects.manageAll')) can('manage', ['Project', 'Task', 'Folder']);
-  if (has('audit.view')) can('read', 'AuditLog');
 
   // Super admins always keep full access, whatever the permission table says.
   if (a.role === 'SUPER_ADMIN') can('manage', 'all');

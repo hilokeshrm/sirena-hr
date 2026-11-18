@@ -193,6 +193,7 @@ class _Entry extends StatelessWidget {
     final who = actor?['fullName'] as String? ?? 'The system';
     final at = DateTime.parse('${row['at']}').toLocal();
     final meta = row['meta'];
+    final changes = (meta is Map ? meta['changes'] : null) as Map?;
     final hasDetail = meta != null || row['entityId'] != null;
     final locked = '${row['action']}'.contains('locked');
     return Padding(
@@ -216,6 +217,19 @@ class _Entry extends StatelessWidget {
                 '${DateFormat('EEE d MMM, HH:mm').format(at)}${actor?['email'] == null ? '' : ' · ${actor!['email']}'}',
                 style: const TextStyle(fontSize: 12),
               ),
+              if (changes != null && changes.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                for (final e in changes.entries)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(text: '${_fieldName('${e.key}')}: ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      TextSpan(text: _value((e.value as Map)['from']), style: const TextStyle(fontSize: 12, decoration: TextDecoration.lineThrough)),
+                      const TextSpan(text: '  to  ', style: TextStyle(fontSize: 12)),
+                      TextSpan(text: _value((e.value as Map)['to']), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    ])),
+                  ),
+              ],
             ]),
           ),
           if (hasDetail)
@@ -244,3 +258,11 @@ class _Entry extends StatelessWidget {
     );
   }
 }
+
+/// `departmentId` and the like are database names; show something a person reads.
+String _fieldName(String key) {
+  final spaced = key.replaceAll(RegExp(r'Id$'), '').replaceAllMapped(RegExp(r'([a-z])([A-Z])'), (m) => '${m[1]} ${m[2]!.toLowerCase()}');
+  return spaced.isEmpty ? key : spaced[0].toUpperCase() + spaced.substring(1);
+}
+
+String _value(dynamic v) => v == null || '$v'.isEmpty ? 'nothing' : '$v';

@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { AccessService, Actor, AppAbility, assertCan, canDo } from '../access/access.service';
 import { AuditService } from '../common/audit.service';
+import { changedFields } from '../common/audit.service';
 import { fromDbDate, sentKeys, toDbDate, todayIST } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
 import { CurrentAbility, CurrentActor } from '../auth/auth.guard';
@@ -114,7 +115,7 @@ export class EmployeesService {
   }
 
   async update(actor: Actor, ability: AppAbility, id: string, dto: EmployeeDto) {
-    const emp = await this.prisma.employee.findUnique({ where: { id }, select: { id: true, locationId: true, role: true } });
+    const emp = await this.prisma.employee.findUnique({ where: { id }, select: RESTRICTED_SELECT });
     if (!emp) throw new NotFoundException();
     // Only super admins edit a super admin's record (their email, status, location...).
     if (emp.role === 'SUPER_ADMIN' && actor.role !== 'SUPER_ADMIN' && emp.id !== actor.id) throw new ForbiddenException('Only a super admin can edit this person');
@@ -132,7 +133,8 @@ export class EmployeesService {
     if (dto.managerId === id) throw new BadRequestException('Someone cannot report to themselves');
     if (dto.status === 'EXITED') await this.keepOneSuperAdmin(id);
     const updated = await this.prisma.employee.update({ where: { id }, data: this.toData(dto) as Prisma.EmployeeUncheckedUpdateInput, select: RESTRICTED_SELECT });
-    await this.audit.log(actor.id, 'update', 'Employee', id, { fields: sentKeys(dto) });
+    const changes = changedFields(emp as Record<string, unknown>, this.toData(dto) as Record<string, unknown>);
+    await this.audit.log(actor.id, 'update', 'Employee', id, { fields: sentKeys(dto), ...(changes ? { changes } : {}) });
     if (before) await this.access.roleChanged(actor, id, before.role, updated.role);
     return updated;
   }

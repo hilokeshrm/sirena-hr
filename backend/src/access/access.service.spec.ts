@@ -141,7 +141,7 @@ describe('defineAbilityFor', () => {
     expect(canDo(admin, 'manage', 'AuditLog')).toBe(true);
     expect(canDo(admin, 'approve', 'LeaveRequest', { employeeId: 'other', status: 'PENDING_HR' })).toBe(true);
     expect(canDo(admin, 'approve', 'LeaveRequest', { employeeId: 'me', status: 'PENDING_HR' })).toBe(false);
-    expect(effectivePermissions('SUPER_ADMIN', [], [['audit.view', false]])).toContain('audit.view');
+    expect(effectivePermissions('SUPER_ADMIN', [], [['offices.manage', false]])).toContain('offices.manage');
 
     const hr = defineAbilityFor(actor('HR'));
     expect(canDo(hr, 'approve', 'LeaveRequest', { employeeId: 'me', employeeLocationId: 'L1', status: 'PENDING_HR' })).toBe(false);
@@ -152,7 +152,7 @@ describe('AccessService grants cache', () => {
   function service(rows: { role: Role; permission: string }[]) {
     const prisma = {
       rolePermission: { findMany: jest.fn(() => Promise.resolve(rows)) },
-      permissionOverride: { findMany: jest.fn(() => Promise.resolve([{ employeeId: 'e1', permission: 'audit.view', granted: true }])) },
+      permissionOverride: { findMany: jest.fn(() => Promise.resolve([{ employeeId: 'e1', permission: 'offices.manage', granted: true }])) },
     };
     return { svc: new AccessService(prisma as never, { log: jest.fn() } as never), prisma };
   }
@@ -160,7 +160,7 @@ describe('AccessService grants cache', () => {
   it('reads grants once until invalidated, ignoring unknown keys', async () => {
     const rows: { role: Role; permission: string }[] = [{ role: 'FINANCE', permission: 'meals.viewReport' }, { role: 'FINANCE', permission: 'gone.permission' }];
     const { svc, prisma } = service(rows);
-    expect(await svc.permissionsOf('e1', 'FINANCE')).toEqual(['meals.viewReport', 'audit.view']);
+    expect(await svc.permissionsOf('e1', 'FINANCE')).toEqual(['offices.manage', 'meals.viewReport']);
     rows.length = 0;
     expect(await svc.permissionsOf('e2', 'FINANCE')).toEqual(['meals.viewReport']);
     expect(prisma.rolePermission.findMany).toHaveBeenCalledTimes(1);

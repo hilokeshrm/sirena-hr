@@ -3,7 +3,7 @@ import { Accrual, HalfDay, HrApproval, LeaveStatus, LeaveType, Prisma } from '@p
 import { Type } from 'class-transformer';
 import { IsBoolean, IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Actor, AppAbility, assertCan, canDo } from '../access/access.service';
-import { AuditService, NotifyService } from '../common/audit.service';
+import { AuditService, changedFields, NotifyService } from '../common/audit.service';
 import { addDays, eachDay, fromDbDate, isWeekend, monthBounds, toDbDate, todayIST } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
 import { CurrentAbility, CurrentActor } from '../auth/auth.guard';
@@ -287,11 +287,18 @@ export class LeaveService {
 
   // ── HR operations ──
 
-  async upsertType(ability: AppAbility, id: string | null, dto: LeaveTypeDto) {
+  async upsertType(actor: Actor, ability: AppAbility, id: string | null, dto: LeaveTypeDto) {
     assertCan(ability, 'manage', 'LeaveType');
-    if (id) return this.prisma.leaveType.update({ where: { id }, data: dto });
+    if (id) {
+      const before = await this.prisma.leaveType.findUniqueOrThrow({ where: { id } });
+      const row = await this.prisma.leaveType.update({ where: { id }, data: dto });
+      await this.audit.log(actor.id, 'update', 'LeaveType', id, { code: row.code, changes: changedFields(before as Record<string, unknown>, dto as Record<string, unknown>) });
+      return row;
+    }
     if (!dto.code || !dto.name) throw new BadRequestException('code and name are required');
-    return this.prisma.leaveType.create({ data: { ...dto, code: dto.code, name: dto.name } });
+    const created = await this.prisma.leaveType.create({ data: { ...dto, code: dto.code, name: dto.name } });
+    await this.audit.log(actor.id, 'create', 'LeaveType', created.id, { code: created.code, name: created.name });
+    return created;
   }
 
   async adjust(actor: Actor, ability: AppAbility, dto: AdjustDto) {
@@ -366,14 +373,14 @@ export class LeaveService {
   async addHoliday(actor: Actor, ability: AppAbility, dto: HolidayDto) {
     assertCan(ability, 'manage', 'Holiday');
     const h = await this.prisma.holiday.create({ data: { date: toDbDate(dto.date.slice(0, 10)), name: dto.name, optional: dto.optional ?? false, locationId: dto.locationId ?? null } });
-    await this.audit.log(actor.id, 'create', 'Holiday', h.id);
+    await this.audit.log(actor.id, 'create', 'Holiday', h.id, { date: dto.date.slice(0, 10), name: dto.name });
     return h;
   }
 
   async deleteHoliday(actor: Actor, ability: AppAbility, id: string) {
     assertCan(ability, 'manage', 'Holiday');
-    await this.prisma.holiday.delete({ where: { id } });
-    await this.audit.log(actor.id, 'delete', 'Holiday', id);
+    const gone = await this.prisma.holiday.delete({ where: { id } });
+    await this.audit.log(actor.id, 'delete', 'Holiday', id, { date: fromDbDate(gone.date), name: gone.name });
     return { ok: true };
   }
 }
@@ -388,13 +395,13 @@ export class LeaveController {
   }
 
   @Post('leave/types')
-  createType(@CurrentAbility() ability: AppAbility, @Body() dto: LeaveTypeDto) {
-    return this.svc.upsertType(ability, null, dto);
+  createType(@CurrentActor() actor: Actor, @CurrentAbility() ability: AppAbility, @Body() dto: LeaveTypeDto) {
+    return this.svc.upsertType(actor, ability, null, dto);
   }
 
   @Patch('leave/types/:id')
-  updateType(@CurrentAbility() ability: AppAbility, @Param('id') id: string, @Body() dto: LeaveTypeDto) {
-    return this.svc.upsertType(ability, id, dto);
+  updateType(@CurrentActor() actor: Actor, @CurrentAbility() ability: AppAbility, @Param('id') id: string, @Body() dto: LeaveTypeDto) {
+    return this.svc.upsertType(actor, ability, id, dto);
   }
 
   @Get('leave/balances')

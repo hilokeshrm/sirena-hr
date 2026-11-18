@@ -87,13 +87,6 @@ export const PERMISSIONS = [
     whenOn: 'Creates projects and opens or edits any project, including restricted folders.',
     defaults: ['HR_ADMIN'],
   },
-  {
-    key: 'audit.view', group: 'Company', label: 'View audit log',
-    description: 'Who changed what, and when.',
-    whenOff: 'Can’t see the audit log.',
-    whenOn: 'Sees who changed what, and when.',
-    defaults: [],
-  },
 ] as const satisfies readonly {
   key: string; group: string; label: string; description: string;
   /** Plain-English effect for one person, without / with the permission (and for location-scoped roles). */
