@@ -39,6 +39,7 @@ const _sideAdmin = [
   _Dest('/admin/cafeteria', 'Cafeteria', Icons.lunch_dining_outlined, permission: 'viewMealReport'),
   _Dest('/admin/policies', 'Policy admin', Icons.gavel_outlined, permission: 'managePolicies'),
   _Dest('/admin/access', 'Roles & access', Icons.admin_panel_settings_outlined, permission: 'manageAccess'),
+  _Dest('/admin/activity', 'Activity', Icons.history, permission: 'viewAudit'),
 ];
 
 /// Bottom tabs on phones; a sidebar (with admin sections the person is allowed to see) on wide screens.

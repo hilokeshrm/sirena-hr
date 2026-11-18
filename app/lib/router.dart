@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'core/session.dart';
 import 'core/theme.dart';
 import 'features/admin/access_admin.dart';
+import 'features/admin/activity_admin.dart';
 import 'features/admin/attendance_admin.dart';
 import 'features/admin/cafeteria_admin.dart';
 import 'features/admin/employees_admin.dart';
@@ -38,6 +39,7 @@ const adminPagePermissions = {
   '/admin/cafeteria': 'viewMealReport',
   '/admin/policies': 'managePolicies',
   '/admin/access': 'manageAccess',
+  '/admin/activity': 'viewAudit',
 };
 
 /// The permission a path needs, or null for pages everyone may open.
@@ -95,6 +97,7 @@ final appRouter = GoRouter(
         _page('/admin/cafeteria', (_) => const CafeteriaAdmin()),
         _page('/admin/policies', (_) => const PoliciesAdmin()),
         _page('/admin/access', (_) => const AccessAdmin()),
+        _page('/admin/activity', (_) => const ActivityAdmin()),
       ],
     ),
   ],

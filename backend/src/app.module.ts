@@ -9,6 +9,7 @@ import { EmployeesModule } from './employees/employees.module';
 import { HealthController } from './health.controller';
 import { LeaveModule } from './leave/leave.module';
 import { PoliciesModule } from './policies/policies.module';
+import { AuditModule } from './audit/audit.module';
 import { PrismaModule } from './prisma/prisma.service';
 import { ProjectsModule } from './projects/projects.module';
 
@@ -25,6 +26,7 @@ import { ProjectsModule } from './projects/projects.module';
     AttendanceModule,
     ProjectsModule,
     PoliciesModule,
+    AuditModule,
   ],
   controllers: [HealthController],
 })

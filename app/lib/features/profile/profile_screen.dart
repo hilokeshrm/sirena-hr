@@ -123,6 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ('/admin/employees', 'Employees', Icons.badge_outlined, 'manageEmployees'),
       ('/admin/attendance', 'Attendance', Icons.fact_check_outlined, 'viewAllAttendance'),
       ('/admin/cafeteria', 'Cafeteria', Icons.lunch_dining_outlined, 'viewMealReport'),
+      ('/admin/activity', 'Activity', Icons.history, 'viewAudit'),
       ('/admin/policies', 'Policy admin', Icons.gavel_outlined, 'managePolicies'),
       ('/admin/access', 'Roles & access', Icons.admin_panel_settings_outlined, 'manageAccess'),
     ].where((l) => l.$4 == null || s.can(l.$4!)).toList();

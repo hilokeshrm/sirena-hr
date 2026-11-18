@@ -192,6 +192,7 @@ export class AuthController {
         manageLeaveRules: canDo(ability, 'manage', 'LeaveType'),
         managePolicies: canDo(ability, 'manage', 'Policy'),
         viewMealReport: canDo(ability, 'read', 'MealReport'),
+        viewAudit: canDo(ability, 'read', 'AuditLog'),
         viewAllAttendance: canDo(ability, 'read', 'Attendance', { employeeId: '_', employeeLocationId: actor.locationId }),
         admin: actor.role === 'SUPER_ADMIN',
         manageAccess: actor.role === 'SUPER_ADMIN',
