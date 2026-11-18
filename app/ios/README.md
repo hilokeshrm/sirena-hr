@@ -52,13 +52,18 @@ app on other people's phones.
 
 ## Building
 
-The app needs to know the server address and its certificate fingerprint.
+```bash
+cd sirena-hr
+app/ios/build.sh
+```
+
+That runs `flutter pub get`, `pod install` and the build, with the server address and certificate
+fingerprint already filled in. The `.ipa` lands in `app/build/ios/ipa/`.
+
+When the server moves, pass the new values instead of editing anything:
 
 ```bash
-cd sirena-hr/app
-flutter build ipa --release \
-  --dart-define=API_BASE=https://106.51.70.71:7777/api \
-  --dart-define=SERVER_CERT_SHA256=46DF38B3F495D7FBF04042CC80ECE4DA58A7AE2C61CAC659A1E475BB92499306
+API_BASE=https://new.address/api SERVER_CERT_SHA256=<fingerprint> app/ios/build.sh
 ```
 
 The fingerprint comes from the server, so re-read it if the certificate is ever replaced:
